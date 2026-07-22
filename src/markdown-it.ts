@@ -1,6 +1,7 @@
 /**
- * markdown-it plugin: render Graphviz DOT fenced code blocks to inline SVG at
- * build time using the pure-TypeScript `graphviz-ts` engine.
+ * markdown-it plugin: render Graphviz DOT fenced code blocks — either to inline
+ * SVG at build time (default) or to a client-side `<GraphvizDiagram>` component
+ * — using the pure-TypeScript `graphviz-ts` engine.
  *
  * This is the engine of `@knowvah/vitepress-plugin-graphviz`. Use it directly
  * via VitePress's `markdown.config`, or use the {@link withGraphviz} wrapper
@@ -12,84 +13,19 @@ import { pathToFileURL } from 'node:url';
 import { tryRenderSvg } from 'graphviz-ts';
 import type { EngineName, GvError, RenderResult } from 'graphviz-ts';
 import type MarkdownIt from 'markdown-it';
+import {
+  currentColorRemap,
+  escapeHtml,
+  parseFenceInfo,
+  toInlineSvg,
+  type GraphvizPluginOptions,
+  type RenderMode,
+} from './shared.js';
 
-/** Options for the DOT-rendering markdown-it plugin. */
-export interface GraphvizPluginOptions {
-  /**
-   * The fenced-code info-string that triggers rendering. Default `"dot"`.
-   * Set to e.g. `"graphviz"` to render ```` ```graphviz ```` while leaving
-   * ```` ```dot ```` blocks as normal syntax-highlighted source.
-   */
-  renderLanguage?: string;
-  /**
-   * Layout engine used when a block does not specify one. Default `"dot"`.
-   * Per-block override: ```` ```dot {engine=neato} ````.
-   */
-  defaultEngine?: EngineName;
-  /** CSS class on the wrapper `<div>` around each diagram. Default `"graphviz"`. */
-  wrapperClass?: string;
-  /**
-   * When set, render in a child process with this millisecond timeout, so a
-   * non-terminating graph fails to an error panel instead of hanging the build.
-   * Omit for fast in-process rendering (trusted author content).
-   */
-  timeout?: number;
-  /**
-   * `"panel"` (default) renders a readable error box on failure; `"throw"`
-   * fails the build on the first bad diagram.
-   */
-  onError?: 'panel' | 'throw';
-  /**
-   * Remap graphviz's default black strokes/text to `currentColor` so diagrams
-   * inherit the surrounding theme's text color (useful for dark mode).
-   * Default `false`.
-   */
-  useCurrentColor?: boolean;
-}
+export { parseFenceInfo } from './shared.js';
+export type { GraphvizPluginOptions, RenderMode } from './shared.js';
 
-const ESCAPE_MAP: Record<string, string> = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-};
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c]);
-}
-
-/** Parse a fence info-string: language + optional `no-render` flag + `engine=`. */
-export function parseFenceInfo(info: string): {
-  lang: string;
-  noRender: boolean;
-  engine?: string;
-} {
-  const trimmed = info.trim();
-  const sp = trimmed.search(/\s/);
-  const lang = sp === -1 ? trimmed : trimmed.slice(0, sp);
-  const rest = sp === -1 ? '' : trimmed.slice(sp + 1);
-  const noRender = /\bno-render\b/.test(rest);
-  const m = rest.match(/\bengine\s*=\s*["']?([A-Za-z][\w-]*)["']?/);
-  return { lang, noRender, engine: m?.[1] };
-}
-
-/**
- * graphviz-ts emits a standalone SVG document (`<?xml ?>` prolog + `<!DOCTYPE>`
- * + comment). Strip everything before the root `<svg` so the fragment is valid
- * to embed inline inside HTML.
- */
-function toInlineSvg(svg: string): string {
-  const i = svg.indexOf('<svg');
-  return i > 0 ? svg.slice(i) : svg;
-}
-
-function currentColorRemap(svg: string): string {
-  return svg
-    .replace(/(stroke|fill)="black"/g, '$1="currentColor"')
-    .replace(/(stroke|fill)="#000000"/g, '$1="currentColor"')
-    .replace(/(stroke|fill)="#000"/g, '$1="currentColor"');
-}
+// --- build-mode child-process worker (the `timeout` safe-mode) --------------
 
 // Inline ESM worker: read DOT from stdin, render, write a JSON RenderResult.
 // Passing the graphviz-ts module URL + engine via env avoids any dependency on
@@ -157,6 +93,8 @@ function childErrorResult(err: unknown, timeout: number): RenderResult {
   };
 }
 
+// --- HTML emission ----------------------------------------------------------
+
 function errorPanel(err: GvError | undefined, wrapperClass: string): string {
   const friendly = escapeHtml(
     err?.friendlyMessage ?? 'The DOT graph could not be rendered.',
@@ -176,6 +114,7 @@ function errorPanel(err: GvError | undefined, wrapperClass: string): string {
 
 interface ResolvedConfig {
   renderLanguage: string;
+  mode: RenderMode;
   defaultEngine: EngineName;
   wrapperClass: string;
   onError: 'panel' | 'throw';
@@ -183,9 +122,8 @@ interface ResolvedConfig {
   useCurrentColor?: boolean;
 }
 
-/** Render one DOT block to HTML: a diagram wrapper on success, an error panel
- * (or a thrown build error) on failure. */
-function renderDotBlock(
+/** Build mode: render one DOT block to inline SVG (or an error panel / throw). */
+function renderBuild(
   dot: string,
   engine: EngineName,
   cfg: ResolvedConfig,
@@ -209,20 +147,44 @@ function renderDotBlock(
   return errorPanel(err, cfg.wrapperClass);
 }
 
+/** Client mode: emit a `<GraphvizDiagram>` component (rendered in the browser).
+ * Requires the component registered in the VitePress theme's `enhanceApp`. */
+function renderClient(
+  dot: string,
+  engine: EngineName,
+  cfg: ResolvedConfig,
+): string {
+  const attrs = [
+    `graph="${encodeURIComponent(dot)}"`,
+    `engine="${escapeHtml(engine)}"`,
+    `wrapper-class="${escapeHtml(cfg.wrapperClass)}"`,
+    cfg.useCurrentColor ? ':use-current-color="true"' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  return `<ClientOnly><GraphvizDiagram ${attrs}></GraphvizDiagram></ClientOnly>\n`;
+}
+
+// --- markdown-it wiring ------------------------------------------------------
+
 type FenceRule = NonNullable<MarkdownIt['renderer']['rules']['fence']>;
 
 const fallbackFence: FenceRule = (tokens, idx, opts, _env, self) =>
   self.renderToken(tokens, idx, opts);
 
+const CONFIG_DEFAULTS = {
+  renderLanguage: 'dot',
+  mode: 'build',
+  defaultEngine: 'dot',
+  wrapperClass: 'graphviz',
+  onError: 'panel',
+} satisfies Partial<ResolvedConfig>;
+
 function resolveConfig(options: GraphvizPluginOptions): ResolvedConfig {
-  return {
-    renderLanguage: options.renderLanguage ?? 'dot',
-    defaultEngine: options.defaultEngine ?? 'dot',
-    wrapperClass: options.wrapperClass ?? 'graphviz',
-    onError: options.onError ?? 'panel',
-    timeout: options.timeout,
-    useCurrentColor: options.useCurrentColor,
-  };
+  const provided = Object.fromEntries(
+    Object.entries(options).filter((entry) => entry[1] !== undefined),
+  );
+  return { ...CONFIG_DEFAULTS, ...provided } as ResolvedConfig;
 }
 
 /**
@@ -239,12 +201,16 @@ export function graphvizMarkdown(
   const delegate = md.renderer.rules.fence ?? fallbackFence;
 
   md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
-    const info = parseFenceInfo(tokens[idx].info);
+    const token = tokens[idx];
+    const info = parseFenceInfo(token.info);
     if (info.lang !== cfg.renderLanguage || info.noRender) {
       return delegate(tokens, idx, opts, env, self);
     }
     const engine = (info.engine ?? cfg.defaultEngine) as EngineName;
-    return renderDotBlock(tokens[idx].content, engine, cfg);
+    const mode = info.mode ?? cfg.mode;
+    return mode === 'client'
+      ? renderClient(token.content, engine, cfg)
+      : renderBuild(token.content, engine, cfg);
   };
 }
 

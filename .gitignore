@@ -4,3 +4,5 @@ demo/.vitepress/dist
 demo/.vitepress/cache
 *.log
 .DS_Store
+
+.serena/cache/

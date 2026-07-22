@@ -21,7 +21,7 @@
 import { graphvizMarkdown, type GraphvizPluginOptions } from './markdown-it.js';
 
 export { graphvizMarkdown, parseFenceInfo } from './markdown-it.js';
-export type { GraphvizPluginOptions } from './markdown-it.js';
+export type { GraphvizPluginOptions, RenderMode } from './markdown-it.js';
 
 /** Minimal structural view of a VitePress `UserConfig` — avoids a hard
  * dependency on the `vitepress` types so the raw markdown-it plugin stays

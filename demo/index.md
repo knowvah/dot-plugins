@@ -17,12 +17,27 @@ digraph {
 
 ## A different engine per block
 
-```dot {engine=neato}
+```dot engine=osage
 graph {
   a -- b;
   b -- c;
   c -- a;
   a -- d;
+}
+```
+
+## Client-side render (renders in your browser, not at build time)
+
+Add `client` to the fence info to render a block in the browser on mount instead
+of at build time — useful for untrusted or interactive graphs. Requires the
+`GraphvizDiagram` component registered in your theme (see this demo's
+`theme/index.ts`). (Use space-separated options, not `{...}` — VitePress reserves
+curly braces in fence info.)
+
+```dot client
+digraph {
+  rankdir=LR;
+  browser -> renders -> this;
 }
 ```
 

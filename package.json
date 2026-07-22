@@ -31,6 +31,10 @@
       "import": "./dist/markdown-it/index.js",
       "types": "./dist/markdown-it/index.d.ts"
     },
+    "./client": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    },
     "./style.css": "./dist/style.css"
   },
   "scripts": {
@@ -43,10 +47,14 @@
   },
   "peerDependencies": {
     "graphviz-ts": ">=0.1.0",
-    "vitepress": "^1.0.0"
+    "vitepress": "^1.0.0",
+    "vue": "^3.4.0"
   },
   "peerDependenciesMeta": {
     "vitepress": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     }
   },
@@ -58,7 +66,8 @@
     "tsup": "^8.5.0",
     "typescript": "^6.0.3",
     "vitepress": "^1.6.4",
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "vue": "^3.5.0"
   },
   "publishConfig": {
     "access": "public"

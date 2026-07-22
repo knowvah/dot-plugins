@@ -64,11 +64,48 @@ That's it. Now ` ```dot ` blocks render.
 
 ### Per-block engine
 
+Per-block options go in the fence info, **space-separated** — not in `{...}`
+(VitePress reserves curly braces in fence info for line highlighting and strips
+them before the plugin sees them):
+
 ````md
-```dot {engine=neato}
+```dot engine=neato
 graph { a -- b -- c -- a }
 ```
 ````
+
+### Client-side render mode
+
+By default diagrams render at build time (static SVG). Set `mode: 'client'`
+globally, or add `client` to a single block, to render in the browser on mount
+instead — useful for untrusted or interactive graphs. Add `build` to a block to
+force build-time rendering when the global default is `client`.
+
+````md
+```dot client
+digraph { a -> b }
+```
+````
+
+Client mode requires registering the `GraphvizDiagram` component in your theme:
+
+```ts
+// docs/.vitepress/theme/index.ts
+import DefaultTheme from 'vitepress/theme';
+import { GraphvizDiagram } from '@knowvah/vitepress-plugin-graphviz/client';
+
+export default {
+  extends: DefaultTheme,
+  enhanceApp({ app }) {
+    app.component('GraphvizDiagram', GraphvizDiagram);
+  },
+};
+```
+
+Trade-offs: build mode ships zero JS and renders instantly; client mode ships the
+graphviz-ts engine to the browser (lazy-loaded on first diagram) and shows a brief
+mount delay, but keeps a pathological graph off your build and re-renders nothing
+on navigation. Both honor `useCurrentColor` for dark mode.
 
 ### Opt a block out (keep it as highlighted source)
 
@@ -104,10 +141,11 @@ export default defineConfig({
 | Option            | Type                   | Default      | Description                                                                                     |
 | ----------------- | ---------------------- | ------------ | ----------------------------------------------------------------------------------------------- |
 | `renderLanguage`  | `string`               | `"dot"`      | The fence info-string that triggers rendering. Set to `"graphviz"` to leave ` ```dot ` as source. |
-| `defaultEngine`   | `EngineName`           | `"dot"`      | Layout engine when a block doesn't specify one. Per-block: ` ```dot {engine=neato} `.           |
+| `mode`            | `'build' \| 'client'`  | `"build"`    | Render at build time (inline SVG) or in the browser. Per-block: add `client` or `build` to the fence. |
+| `defaultEngine`   | `EngineName`           | `"dot"`      | Layout engine when a block doesn't specify one. Per-block: ` ```dot engine=neato `.             |
 | `wrapperClass`    | `string`               | `"graphviz"` | CSS class on the wrapper `<div>` (and `<class>-error` on the error panel).                       |
-| `timeout`         | `number` (ms)          | —            | Render in a child process with this timeout (see **Security** below).                            |
-| `onError`         | `'panel' \| 'throw'`   | `"panel"`    | Show an error box, or fail the build on the first bad diagram.                                   |
+| `timeout`         | `number` (ms)          | —            | Build mode only: render in a child process with this timeout (see **Security**).                 |
+| `onError`         | `'panel' \| 'throw'`   | `"panel"`    | Build mode only: show an error box, or fail the build on the first bad diagram.                   |
 | `useCurrentColor` | `boolean`              | `false`      | Remap Graphviz's default black strokes/text to `currentColor` for theme-aware (dark-mode) diagrams. |
 
 Engines: `dot`, `neato`, `fdp`, `sfdp`, `circo`, `twopi`, `osage`, `patchwork`.

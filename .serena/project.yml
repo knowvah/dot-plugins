@@ -1,0 +1,3 @@
+project_name: "vitepress-plugin-graphviz"
+encoding: "utf-8"
+languages: [javascript, typescript]

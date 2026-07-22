@@ -17,16 +17,22 @@ describe('parseFenceInfo', () => {
   it('extracts the language', () => {
     expect(parseFenceInfo('dot')).toEqual({ lang: 'dot', noRender: false });
   });
-  it('reads an engine from a brace block', () => {
-    expect(parseFenceInfo('dot {engine=neato}')).toMatchObject({
+  it('reads a space-separated engine (the VitePress-safe form)', () => {
+    expect(parseFenceInfo('dot engine=neato')).toMatchObject({
       lang: 'dot',
       engine: 'neato',
     });
   });
-  it('reads an engine from a bare key=value', () => {
+  it('reads a quoted engine value', () => {
     expect(parseFenceInfo('dot engine="circo"')).toMatchObject({
       lang: 'dot',
       engine: 'circo',
+    });
+  });
+  it('also tolerates the {brace} form (non-VitePress markdown-it hosts)', () => {
+    expect(parseFenceInfo('dot {engine=neato}')).toMatchObject({
+      lang: 'dot',
+      engine: 'neato',
     });
   });
   it('detects the no-render flag', () => {
@@ -53,7 +59,7 @@ describe('graphvizMarkdown — rendering', () => {
   });
 
   it('honors a per-block engine override', () => {
-    const out = renderFence('dot {engine=neato}', 'graph { a -- b -- c -- a }');
+    const out = renderFence('dot engine=neato', 'graph { a -- b -- c -- a }');
     expect(out).toContain('<svg');
     expect(out).not.toContain('graphviz-error');
   });
@@ -127,6 +133,59 @@ describe('graphvizMarkdown — delegation (does not clobber other fences)', () =
     // a non-dot fence should reach the sentinel; a dot fence should render
     expect(md.render('```js\nx\n```')).toContain('SENTINEL');
     expect(md.render('```dot\ndigraph{a->b}\n```')).toContain('<svg');
+  });
+});
+
+describe('parseFenceInfo — render mode flags', () => {
+  it('detects client mode', () => {
+    expect(parseFenceInfo('dot client')).toMatchObject({ mode: 'client' });
+  });
+  it('detects build mode', () => {
+    expect(parseFenceInfo('dot build')).toMatchObject({ mode: 'build' });
+  });
+  it('leaves mode undefined when unspecified', () => {
+    expect(parseFenceInfo('dot').mode).toBeUndefined();
+  });
+});
+
+describe('graphvizMarkdown — client mode', () => {
+  it('emits a <GraphvizDiagram> component (not build-time SVG) in client mode', () => {
+    const out = renderFence('dot', 'digraph { a -> b }', { mode: 'client' });
+    expect(out).toContain('<ClientOnly>');
+    expect(out).toContain('<GraphvizDiagram');
+    expect(out).toContain('graph=');
+    expect(out).not.toContain('<svg');
+  });
+
+  it('URI-encodes the DOT into the graph prop', () => {
+    const out = renderFence('dot', 'digraph { a -> b }', { mode: 'client' });
+    // content carries a trailing newline; assert the encoded body is present.
+    expect(out).toContain('graph="' + encodeURIComponent('digraph { a -> b }'));
+  });
+
+  it('passes engine and useCurrentColor to the component', () => {
+    const out = renderFence('dot engine=neato', 'graph { a -- b }', {
+      mode: 'client',
+      useCurrentColor: true,
+    });
+    expect(out).toContain('engine="neato"');
+    expect(out).toContain(':use-current-color="true"');
+  });
+
+  it('per-block client overrides a global build default', () => {
+    const out = renderFence('dot client', 'digraph { a -> b }', {
+      mode: 'build',
+    });
+    expect(out).toContain('<GraphvizDiagram');
+    expect(out).not.toContain('<svg');
+  });
+
+  it('per-block build overrides a global client default', () => {
+    const out = renderFence('dot build', 'digraph { a -> b }', {
+      mode: 'client',
+    });
+    expect(out).toContain('<svg');
+    expect(out).not.toContain('<GraphvizDiagram');
   });
 });
 
