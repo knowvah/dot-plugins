@@ -107,13 +107,42 @@ graphviz-ts engine to the browser (lazy-loaded on first diagram) and shows a bri
 mount delay, but keeps a pathological graph off your build and re-renders nothing
 on navigation. Both honor `useCurrentColor` for dark mode.
 
-### Opt a block out (keep it as highlighted source)
+### Opt a block out (keep it as source)
+
+Add `no-render` and the plugin hands the block back to VitePress's fence
+renderer untouched:
 
 ````md
 ```dot no-render
 digraph { a -> b }
 ```
 ````
+
+### Highlighting DOT source
+
+The plugin renders diagrams; it does **not** provide syntax highlighting. Any
+DOT block it doesn't render — `no-render` blocks, or all `dot` blocks when
+`renderLanguage` is something else — is delegated to VitePress's Shiki
+highlighter, and **Shiki bundles no DOT/Graphviz grammar**, so those blocks show
+as plain (uncolored) text.
+
+To colorize DOT source, register a TextMate grammar for it via
+`markdown.languages`:
+
+```ts
+// docs/.vitepress/config.ts
+import dotGrammar from './dot.tmLanguage'; // a TextMate grammar (scopeName source.dot)
+
+export default withDot(
+  defineConfig({
+    markdown: { languages: [dotGrammar] },
+  }),
+);
+```
+
+A ready-made DOT grammar is in the graphviz-ts docs
+(`docs-site/.vitepress/dot.tmLanguage.ts`), or use any community
+`source.dot` TextMate grammar.
 
 ### Compose with other markdown plugins
 

@@ -17,7 +17,7 @@ digraph {
 
 ## A different engine per block
 
-```dot engine=osage
+```dot engine=patchwork
 graph {
   a -- b;
   b -- c;
@@ -41,7 +41,12 @@ digraph {
 }
 ```
 
-## Opt a block out of rendering (keeps it as highlighted source)
+## Opt a block out of rendering (keeps it as plain source)
+
+Add `no-render` and the plugin hands the block back to VitePress's normal fence
+renderer untouched. It shows as source below — plain, not colorized, because
+**Shiki ships no DOT grammar**. To syntax-highlight DOT, register a TextMate
+grammar via `markdown.languages` (see the README "Highlighting DOT source").
 
 ```dot no-render
 digraph { this -> stays -> as -> source }
