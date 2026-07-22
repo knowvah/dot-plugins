@@ -6,3 +6,8 @@ demo/.vitepress/cache
 .DS_Store
 
 .serena/cache/
+
+# tooling / session artifacts
+.serena/
+.mcp.json
+.agent-notes/
