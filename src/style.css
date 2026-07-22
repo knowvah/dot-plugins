@@ -1,18 +1,18 @@
-/* @knowvah/vitepress-plugin-graphviz — diagram wrapper + error panel styles.
-   Import once in your theme or config: import '@knowvah/vitepress-plugin-graphviz/style.css'; */
+/* @knowvah/vitepress-plugin-dot — diagram wrapper + error panel styles.
+   Import once in your theme or config: import '@knowvah/vitepress-plugin-dot/style.css'; */
 
-.graphviz {
+.dot-diagram {
   overflow-x: auto;
   text-align: center;
   margin: 16px 0;
 }
 
-.graphviz svg {
+.dot-diagram svg {
   max-width: 100%;
   height: auto;
 }
 
-.graphviz-error {
+.dot-diagram-error {
   margin: 16px 0;
   padding: 12px 16px;
   border: 1px solid var(--vp-c-danger-1, #e5534b);
@@ -23,7 +23,7 @@
   line-height: 1.5;
 }
 
-.graphviz-error code {
+.dot-diagram-error code {
   font-family: var(--vp-font-family-mono, ui-monospace, monospace);
   font-size: 0.9em;
 }

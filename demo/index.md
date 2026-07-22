@@ -1,4 +1,4 @@
-# vitepress-plugin-graphviz demo
+# vitepress-plugin-dot demo
 
 Each ` ```dot ` block below is rendered to inline SVG **at build time** — view
 source on this page and you'll see `<svg>`, not a `<script>` or a code block.
@@ -30,7 +30,7 @@ graph {
 
 Add `client` to the fence info to render a block in the browser on mount instead
 of at build time — useful for untrusted or interactive graphs. Requires the
-`GraphvizDiagram` component registered in your theme (see this demo's
+`DotDiagram` component registered in your theme (see this demo's
 `theme/index.ts`). (Use space-separated options, not `{...}` — VitePress reserves
 curly braces in fence info.)
 

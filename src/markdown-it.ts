@@ -1,10 +1,10 @@
 /**
  * markdown-it plugin: render Graphviz DOT fenced code blocks — either to inline
- * SVG at build time (default) or to a client-side `<GraphvizDiagram>` component
+ * SVG at build time (default) or to a client-side `<DotDiagram>` component
  * — using the pure-TypeScript `graphviz-ts` engine.
  *
- * This is the engine of `@knowvah/vitepress-plugin-graphviz`. Use it directly
- * via VitePress's `markdown.config`, or use the {@link withGraphviz} wrapper
+ * This is the engine of `@knowvah/vitepress-plugin-dot`. Use it directly
+ * via VitePress's `markdown.config`, or use the {@link withDot} wrapper
  * from the package root.
  */
 import { execFileSync } from 'node:child_process';
@@ -18,12 +18,12 @@ import {
   escapeHtml,
   parseFenceInfo,
   toInlineSvg,
-  type GraphvizPluginOptions,
+  type DotPluginOptions,
   type RenderMode,
 } from './shared.js';
 
 export { parseFenceInfo } from './shared.js';
-export type { GraphvizPluginOptions, RenderMode } from './shared.js';
+export type { DotPluginOptions, RenderMode } from './shared.js';
 
 // --- build-mode child-process worker (the `timeout` safe-mode) --------------
 
@@ -141,13 +141,13 @@ function renderBuild(
   const err = result.errors?.[0];
   if (cfg.onError === 'throw') {
     throw new Error(
-      `[vitepress-plugin-graphviz] ${err?.message ?? 'render failed'}`,
+      `[vitepress-plugin-dot] ${err?.message ?? 'render failed'}`,
     );
   }
   return errorPanel(err, cfg.wrapperClass);
 }
 
-/** Client mode: emit a `<GraphvizDiagram>` component (rendered in the browser).
+/** Client mode: emit a `<DotDiagram>` component (rendered in the browser).
  * Requires the component registered in the VitePress theme's `enhanceApp`. */
 function renderClient(
   dot: string,
@@ -162,7 +162,7 @@ function renderClient(
   ]
     .filter(Boolean)
     .join(' ');
-  return `<ClientOnly><GraphvizDiagram ${attrs}></GraphvizDiagram></ClientOnly>\n`;
+  return `<ClientOnly><DotDiagram ${attrs}></DotDiagram></ClientOnly>\n`;
 }
 
 // --- markdown-it wiring ------------------------------------------------------
@@ -176,11 +176,11 @@ const CONFIG_DEFAULTS = {
   renderLanguage: 'dot',
   mode: 'build',
   defaultEngine: 'dot',
-  wrapperClass: 'graphviz',
+  wrapperClass: 'dot-diagram',
   onError: 'panel',
 } satisfies Partial<ResolvedConfig>;
 
-function resolveConfig(options: GraphvizPluginOptions): ResolvedConfig {
+function resolveConfig(options: DotPluginOptions): ResolvedConfig {
   const provided = Object.fromEntries(
     Object.entries(options).filter((entry) => entry[1] !== undefined),
   );
@@ -193,9 +193,9 @@ function resolveConfig(options: GraphvizPluginOptions): ResolvedConfig {
  * of other languages — and of opted-out ```` ```dot no-render ```` blocks — is
  * untouched).
  */
-export function graphvizMarkdown(
+export function dotMarkdown(
   md: MarkdownIt,
-  options: GraphvizPluginOptions = {},
+  options: DotPluginOptions = {},
 ): void {
   const cfg = resolveConfig(options);
   const delegate = md.renderer.rules.fence ?? fallbackFence;
@@ -214,4 +214,4 @@ export function graphvizMarkdown(
   };
 }
 
-export default graphvizMarkdown;
+export default dotMarkdown;

@@ -6,12 +6,12 @@
  * ```ts
  * // docs/.vitepress/theme/index.ts
  * import DefaultTheme from 'vitepress/theme';
- * import { GraphvizDiagram } from '@knowvah/vitepress-plugin-graphviz/client';
+ * import { DotDiagram } from '@knowvah/vitepress-plugin-dot/client';
  *
  * export default {
  *   extends: DefaultTheme,
  *   enhanceApp({ app }) {
- *     app.component('GraphvizDiagram', GraphvizDiagram);
+ *     app.component('DotDiagram', DotDiagram);
  *   },
  * };
  * ```
@@ -51,15 +51,15 @@ export async function renderDiagram(
 }
 
 /**
- * `<GraphvizDiagram>` — renders its `graph` prop (a URI-encoded DOT string) to
+ * `<DotDiagram>` — renders its `graph` prop (a URI-encoded DOT string) to
  * SVG on mount. Emitted by the markdown-it plugin in client mode.
  */
-export const GraphvizDiagram = defineComponent({
-  name: 'GraphvizDiagram',
+export const DotDiagram = defineComponent({
+  name: 'DotDiagram',
   props: {
     graph: { type: String, required: true },
     engine: { type: String, default: 'dot' },
-    wrapperClass: { type: String, default: 'graphviz' },
+    wrapperClass: { type: String, default: 'dot-diagram' },
     useCurrentColor: { type: Boolean, default: false },
   },
   setup(props) {
@@ -85,4 +85,4 @@ export const GraphvizDiagram = defineComponent({
   },
 });
 
-export default GraphvizDiagram;
+export default DotDiagram;

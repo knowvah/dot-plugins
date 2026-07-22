@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GraphvizDiagram, renderDiagram } from './client.js';
+import { DotDiagram, renderDiagram } from './client.js';
 
 describe('renderDiagram (client-side render pipeline)', () => {
   it('renders valid DOT to an inline SVG fragment', async () => {
@@ -30,13 +30,13 @@ describe('renderDiagram (client-side render pipeline)', () => {
   });
 });
 
-describe('GraphvizDiagram component', () => {
-  it('is a Vue component named GraphvizDiagram', () => {
-    expect(GraphvizDiagram.name).toBe('GraphvizDiagram');
+describe('DotDiagram component', () => {
+  it('is a Vue component named DotDiagram', () => {
+    expect(DotDiagram.name).toBe('DotDiagram');
   });
 
   it('declares the expected props', () => {
-    const props = GraphvizDiagram.props as Record<string, unknown>;
+    const props = DotDiagram.props as Record<string, unknown>;
     expect(Object.keys(props).sort()).toEqual(
       ['engine', 'graph', 'useCurrentColor', 'wrapperClass'].sort(),
     );

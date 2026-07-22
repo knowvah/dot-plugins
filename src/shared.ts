@@ -8,7 +8,7 @@ import type { EngineName } from 'graphviz-ts';
 export type RenderMode = 'build' | 'client';
 
 /** Options for the DOT-rendering plugin. */
-export interface GraphvizPluginOptions {
+export interface DotPluginOptions {
   /**
    * The fenced-code info-string that triggers rendering. Default `"dot"`.
    * Set to e.g. `"graphviz"` to render ```` ```graphviz ```` while leaving
@@ -18,7 +18,7 @@ export interface GraphvizPluginOptions {
   /**
    * Default render mode. `"build"` (default) renders to inline SVG during the
    * VitePress build; `"client"` renders in the browser on mount (requires the
-   * `GraphvizDiagram` component registered in your theme). Per-block override
+   * `DotDiagram` component registered in your theme). Per-block override
    * (space-separated in the fence info): ```` ```dot client ```` or
    * ```` ```dot build ````.
    */
@@ -32,7 +32,7 @@ export interface GraphvizPluginOptions {
    * the plugin sees the info-string.
    */
   defaultEngine?: EngineName;
-  /** CSS class on the wrapper `<div>` around each diagram. Default `"graphviz"`. */
+  /** CSS class on the wrapper `<div>` around each diagram. Default `"dot-diagram"`. */
   wrapperClass?: string;
   /**
    * Build mode only: render in a child process with this millisecond timeout,

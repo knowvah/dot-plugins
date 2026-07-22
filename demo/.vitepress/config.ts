@@ -1,10 +1,10 @@
 import { defineConfig } from 'vitepress';
 // Consume the built package artifact (proves the shipped dist works end-to-end).
-import { withGraphviz } from '../../dist/index.js';
+import { withDot } from '../../dist/index.js';
 
-export default withGraphviz(
+export default withDot(
   defineConfig({
-    title: 'vitepress-plugin-graphviz',
+    title: 'vitepress-plugin-dot',
     description: 'Build-time Graphviz DOT rendering for VitePress',
   }),
   { useCurrentColor: true },

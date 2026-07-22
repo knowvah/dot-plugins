@@ -1,4 +1,4 @@
-# @knowvah/vitepress-plugin-graphviz
+# @knowvah/vitepress-plugin-dot
 
 Render [Graphviz](https://graphviz.org/) **DOT** fenced code blocks to inline SVG
 in [VitePress](https://vitepress.dev/) — **at build time**, with no client-side
@@ -26,7 +26,7 @@ digraph {
 ## Install
 
 ```bash
-npm i -D @knowvah/vitepress-plugin-graphviz graphviz-ts
+npm i -D @knowvah/vitepress-plugin-dot graphviz-ts
 ```
 
 `graphviz-ts` is a peer dependency — you install the engine version you want.
@@ -38,9 +38,9 @@ Wrap your VitePress config and import the stylesheet in your theme:
 ```ts
 // docs/.vitepress/config.ts
 import { defineConfig } from 'vitepress';
-import { withGraphviz } from '@knowvah/vitepress-plugin-graphviz';
+import { withDot } from '@knowvah/vitepress-plugin-dot';
 
-export default withGraphviz(
+export default withDot(
   defineConfig({
     title: 'My Docs',
   }),
@@ -55,7 +55,7 @@ export default withGraphviz(
 ```ts
 // docs/.vitepress/theme/index.ts
 import DefaultTheme from 'vitepress/theme';
-import '@knowvah/vitepress-plugin-graphviz/style.css';
+import '@knowvah/vitepress-plugin-dot/style.css';
 
 export default DefaultTheme;
 ```
@@ -87,17 +87,17 @@ digraph { a -> b }
 ```
 ````
 
-Client mode requires registering the `GraphvizDiagram` component in your theme:
+Client mode requires registering the `DotDiagram` component in your theme:
 
 ```ts
 // docs/.vitepress/theme/index.ts
 import DefaultTheme from 'vitepress/theme';
-import { GraphvizDiagram } from '@knowvah/vitepress-plugin-graphviz/client';
+import { DotDiagram } from '@knowvah/vitepress-plugin-dot/client';
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    app.component('GraphvizDiagram', GraphvizDiagram);
+    app.component('DotDiagram', DotDiagram);
   },
 };
 ```
@@ -117,21 +117,21 @@ digraph { a -> b }
 
 ### Compose with other markdown plugins
 
-`withGraphviz` preserves any existing `markdown.config` hook, so it composes with
+`withDot` preserves any existing `markdown.config` hook, so it composes with
 plugins like [`vitepress-plugin-mermaid`](https://www.npmjs.com/package/vitepress-plugin-mermaid):
 
 ```ts
-export default withGraphviz(withMermaid(defineConfig({ /* ... */ })));
+export default withDot(withMermaid(defineConfig({ /* ... */ })));
 ```
 
 You can also skip the wrapper and register the markdown-it plugin directly:
 
 ```ts
-import { graphvizMarkdown } from '@knowvah/vitepress-plugin-graphviz/markdown-it';
+import { dotMarkdown } from '@knowvah/vitepress-plugin-dot/markdown-it';
 
 export default defineConfig({
   markdown: {
-    config: (md) => graphvizMarkdown(md, { defaultEngine: 'dot' }),
+    config: (md) => dotMarkdown(md, { defaultEngine: 'dot' }),
   },
 });
 ```
@@ -143,7 +143,7 @@ export default defineConfig({
 | `renderLanguage`  | `string`               | `"dot"`      | The fence info-string that triggers rendering. Set to `"graphviz"` to leave ` ```dot ` as source. |
 | `mode`            | `'build' \| 'client'`  | `"build"`    | Render at build time (inline SVG) or in the browser. Per-block: add `client` or `build` to the fence. |
 | `defaultEngine`   | `EngineName`           | `"dot"`      | Layout engine when a block doesn't specify one. Per-block: ` ```dot engine=neato `.             |
-| `wrapperClass`    | `string`               | `"graphviz"` | CSS class on the wrapper `<div>` (and `<class>-error` on the error panel).                       |
+| `wrapperClass`    | `string`               | `"dot-diagram"` | CSS class on the wrapper `<div>` (and `<class>-error` on the error panel).                    |
 | `timeout`         | `number` (ms)          | —            | Build mode only: render in a child process with this timeout (see **Security**).                 |
 | `onError`         | `'panel' \| 'throw'`   | `"panel"`    | Build mode only: show an error box, or fail the build on the first bad diagram.                   |
 | `useCurrentColor` | `boolean`              | `false`      | Remap Graphviz's default black strokes/text to `currentColor` for theme-aware (dark-mode) diagrams. |
