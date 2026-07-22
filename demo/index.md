@@ -41,12 +41,13 @@ digraph {
 }
 ```
 
-## Opt a block out of rendering (keeps it as plain source)
+## Opt a block out of rendering (kept as source, still highlighted)
 
 Add `no-render` and the plugin hands the block back to VitePress's normal fence
-renderer untouched. It shows as source below — plain, not colorized, because
-**Shiki ships no DOT grammar**. To syntax-highlight DOT, register a TextMate
-grammar via `markdown.languages` (see the README "Highlighting DOT source").
+renderer untouched — shown as source below. It's syntax-highlighted because this
+demo registers a DOT TextMate grammar via `markdown.languages` (Shiki bundles no
+`dot` grammar; see `.vitepress/config.ts` and the README "Highlighting DOT
+source").
 
 ```dot no-render
 digraph { this -> stays -> as -> source }
