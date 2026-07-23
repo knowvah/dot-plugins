@@ -6,14 +6,20 @@ generators, powered by the pure-TypeScript
 (inline SVG, zero client JS) or client-side.
 
 A pnpm workspace. The framework-agnostic render engine lives in one place;
-each generator gets a thin adapter package.
+each generator gets a thin adapter package, and app frameworks get a component.
 
 | Package | Target | Status |
 | --- | --- | --- |
-| [`@knowvah/dot-core`](packages/core) | — (shared engine) | ✅ render + parse + browser |
+| [`@knowvah/dot-core`](packages/core) | — (shared engine + `<dot-diagram>` web component) | ✅ render + parse + browser + element |
 | [`@knowvah/vitepress-plugin-dot`](packages/vitepress) | VitePress (markdown-it) | ✅ build-time SSR + client mode |
-| [`@knowvah/eleventy-plugin-dot`](packages/eleventy) | Eleventy (markdown-it) | ✅ build mode |
-| [`@knowvah/docusaurus-plugin-dot`](packages/docusaurus) | Docusaurus (MDX/remark) | ✅ client mode |
+| [`@knowvah/eleventy-plugin-dot`](packages/eleventy) | Eleventy (markdown-it) | ✅ build mode + client |
+| [`@knowvah/docusaurus-plugin-dot`](packages/docusaurus) | Docusaurus (MDX/remark) | ✅ build-time SSR + client mode |
+| [`@knowvah/dot-markdown-it`](packages/markdown-it) | any markdown-it host | ✅ build + client |
+| [`@knowvah/dot-react`](packages/react) | React apps (`<DotDiagram>`) | ✅ client component |
+
+**Angular · Svelte · Solid · plain HTML:** use the framework-neutral
+`<dot-diagram>` web component from `@knowvah/dot-core/element` — no dedicated
+package needed. See the [core README](packages/core#angular-and-any-framework-with-custom-element-support).
 
 ## Develop
 

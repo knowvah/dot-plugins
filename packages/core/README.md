@@ -54,6 +54,42 @@ defineDotDiagram(); // registers <dot-diagram>
 <dot-diagram graph="digraph%20%7B%20a%20-%3E%20b%20%7D" use-current-color></dot-diagram>
 ```
 
+The `graph` attribute is **URI-encoded** DOT source, `engine` picks the layout
+engine, `wrapper-class` overrides the CSS class, and the boolean
+`use-current-color` remaps black → `currentColor`.
+
+### Angular (and any framework with custom-element support)
+
+`<dot-diagram>` works anywhere custom elements do — Angular, Svelte, Solid,
+plain HTML. In Angular, register it once and allow the tag with
+`CUSTOM_ELEMENTS_SCHEMA`:
+
+```ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { defineDotDiagram } from '@knowvah/dot-core/element';
+
+defineDotDiagram(); // registers <dot-diagram> once
+
+@Component({
+  standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `<dot-diagram [attr.graph]="encodedDot" engine="dot"></dot-diagram>`,
+})
+export class DiagramComponent {
+  // Encode so any DOT source (spaces, %, quotes) survives the attribute.
+  readonly encodedDot = encodeURIComponent('digraph { a -> b }');
+}
+```
+
+Import `@knowvah/dot-core`'s `.dot-diagram` styles (or your own) for
+overflow/centering.
+
+**One-shot render:** the element renders once when it connects to the DOM and
+does not observe later attribute changes. For a graph that changes at runtime,
+have Angular destroy and recreate the element when the source changes — e.g.
+gate it behind `@if` (or `*ngIf`) and toggle, or key it in an `@for`/`*ngFor`
+whose `trackBy` returns the DOT string — rather than mutating `graph` in place.
+
 ## Options (`DotPluginOptions`)
 
 `renderLanguage`, `mode` (`build` | `client`), `defaultEngine`, `wrapperClass`,
