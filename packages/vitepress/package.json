@@ -14,13 +14,16 @@
     "svg",
     "graphviz-ts"
   ],
-  "homepage": "https://github.com/knowvah/vitepress-plugin-dot#readme",
+  "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/vitepress#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/knowvah/vitepress-plugin-dot.git"
+    "url": "git+https://github.com/knowvah/dot-plugins.git",
+    "directory": "packages/vitepress"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {

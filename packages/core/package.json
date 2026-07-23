@@ -11,8 +11,16 @@
     "graphviz-ts",
     "render"
   ],
+  "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knowvah/dot-plugins.git",
+    "directory": "packages/core"
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {
@@ -22,6 +30,10 @@
     "./browser": {
       "import": "./dist/browser/index.js",
       "types": "./dist/browser/index.d.ts"
+    },
+    "./element": {
+      "import": "./dist/element/index.js",
+      "types": "./dist/element/index.d.ts"
     }
   },
   "scripts": {
@@ -36,6 +48,7 @@
   "devDependencies": {
     "@types/node": "^22.0.0",
     "graphviz-ts": "^0.1.0",
+    "jsdom": "^25.0.0",
     "tsup": "^8.5.0",
     "typescript": "^6.0.3",
     "vitest": "^3.0.0"

@@ -21,7 +21,9 @@
     "directory": "packages/eleventy"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "exports": {
     ".": {

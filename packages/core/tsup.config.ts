@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'browser/index': 'src/browser.ts',
+    'element/index': 'src/element.ts',
   },
   format: ['esm'],
   dts: true,
