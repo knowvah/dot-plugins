@@ -34,7 +34,8 @@
     "build": "tsup && cp src/style.css dist/style.css",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "demo:build": "eleventy --input=demo --output=demo/_site --config=demo/eleventy.config.js"
   },
   "dependencies": {
     "@knowvah/dot-core": "workspace:*"
@@ -49,6 +50,7 @@
     }
   },
   "devDependencies": {
+    "@11ty/eleventy": "^3.0.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.0.0",
     "graphviz-ts": "^0.1.0",

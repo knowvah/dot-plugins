@@ -66,13 +66,13 @@ importers:
 
   packages/eleventy:
     dependencies:
-      '@11ty/eleventy':
-        specifier: '>=2.0.0'
-        version: 3.1.6
       '@knowvah/dot-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@11ty/eleventy':
+        specifier: ^3.0.0
+        version: 3.1.6
       '@types/markdown-it':
         specifier: ^14.1.2
         version: 14.1.2
