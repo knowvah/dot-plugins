@@ -23,3 +23,18 @@ pnpm -r build      # build every package
 pnpm -r test       # test every package
 pnpm -r typecheck
 ```
+
+## Releasing
+
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets).
+
+```bash
+pnpm changeset          # describe a change (pick packages + bump type)
+```
+
+On push to `main`, `.github/workflows/release.yml` opens/updates a
+"Version Packages" PR that applies the changesets (bumping versions + changelogs);
+merging it publishes the changed packages to npm. Requires a free `knowvah` npm
+org and the repo secret `NPM_TOKEN` (an npm automation token). `@knowvah/dot-core`
+publishes first; the adapters' `workspace:*` dep on it is rewritten to the real
+version at publish time.
