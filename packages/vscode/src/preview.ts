@@ -34,24 +34,61 @@ function isLineComment(line: string): boolean {
   return line.startsWith('//') || line.startsWith('#');
 }
 
+/** A located engine directive: the engine plus its position in the source, so
+ * the extension can anchor a diagnostic on it. Columns are 0-based. */
+export interface EngineDirective {
+  engine: BuiltinEngine;
+  line: number;
+  start: number;
+  end: number;
+}
+
 /**
- * Parse an engine directive from a document's leading line comments
- * (`// engine: neato`). Scanning stops at the first line of graph content, so
- * only a header comment counts. Returns the engine, or `undefined` if there is
- * no (recognized) directive.
+ * Find the engine directive in a document's leading line comments
+ * (`// engine: neato`), with its location. Scanning stops at the first line of
+ * graph content, so only a header comment counts. `undefined` if there is no
+ * (recognized) directive.
  */
-export function parseEngineDirective(dot: string): BuiltinEngine | undefined {
-  for (const raw of dot.split('\n')) {
-    const line = raw.trim();
-    if (line === '') continue;
-    if (!isLineComment(line)) break; // reached the graph body
-    const match = ENGINE_DIRECTIVE.exec(line);
+export function findEngineDirective(dot: string): EngineDirective | undefined {
+  const lines = dot.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (trimmed === '') continue;
+    if (!isLineComment(trimmed)) break; // reached the graph body
+    const match = ENGINE_DIRECTIVE.exec(lines[i]); // raw line → correct columns
     if (match !== null) {
       const name = match[1].toLowerCase() as BuiltinEngine;
-      if (BUILTIN_ENGINES.includes(name)) return name;
+      if (BUILTIN_ENGINES.includes(name)) {
+        return { engine: name, line: i, start: match.index, end: match.index + match[0].length };
+      }
     }
   }
   return undefined;
+}
+
+/** The engine declared by a document's directive, or `undefined` if none. */
+export function parseEngineDirective(dot: string): BuiltinEngine | undefined {
+  return findEngineDirective(dot)?.engine;
+}
+
+/** A remembered override that disagrees with the file's declared directive. */
+export interface EngineConflict extends EngineDirective {
+  override: BuiltinEngine;
+}
+
+/**
+ * Detect a conflict between what is *declared* (an in-file directive) and what
+ * is *stored* (a remembered per-file override). Returns the located conflict
+ * when both are present and differ, else `undefined`.
+ */
+export function engineConflict(
+  dot: string,
+  override: BuiltinEngine | undefined,
+): EngineConflict | undefined {
+  if (override === undefined) return undefined;
+  const directive = findEngineDirective(dot);
+  if (directive === undefined || directive.engine === override) return undefined;
+  return { ...directive, override };
 }
 
 /** The ordered engine sources for a document; the first present one wins. */

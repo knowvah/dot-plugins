@@ -2,10 +2,52 @@ import { describe, it, expect } from 'vitest';
 import {
   previewDocument,
   parseEngineDirective,
+  findEngineDirective,
+  engineConflict,
   resolveEngine,
 } from './preview.js';
 
 const CSP = 'vscode-webview://xyz';
+
+describe('findEngineDirective', () => {
+  it('locates the directive line and columns', () => {
+    expect(findEngineDirective('// engine: neato\ndigraph {}')).toEqual({
+      engine: 'neato',
+      line: 0,
+      start: 3,
+      end: 16,
+    });
+  });
+
+  it('reports the correct line when the directive follows other comments', () => {
+    const d = findEngineDirective('// title\n\n#  engine = fdp\ndigraph {}');
+    expect(d?.engine).toBe('fdp');
+    expect(d?.line).toBe(2);
+  });
+
+  it('returns undefined when there is no directive', () => {
+    expect(findEngineDirective('digraph {}')).toBeUndefined();
+  });
+});
+
+describe('engineConflict', () => {
+  it('flags a declared directive that disagrees with a remembered override', () => {
+    expect(engineConflict('// engine: neato\ndigraph {}', 'fdp')).toMatchObject({
+      engine: 'neato',
+      override: 'fdp',
+      line: 0,
+    });
+  });
+
+  it('no conflict when the override matches the directive', () => {
+    expect(engineConflict('// engine: neato\ndigraph {}', 'neato')).toBeUndefined();
+  });
+
+  it('no conflict without a directive or without an override', () => {
+    expect(engineConflict('digraph {}', 'fdp')).toBeUndefined();
+    expect(engineConflict('// engine: neato\ndigraph {}', undefined)).toBeUndefined();
+  });
+});
 
 describe('parseEngineDirective', () => {
   it('returns undefined when there is no directive', () => {

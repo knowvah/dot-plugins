@@ -55,6 +55,14 @@ The preview panel title shows the engine in use (e.g. `Preview graph.dot
 (neato)`). `dot.preview.defaultEngine` also sets the default for ` ```dot `
 blocks in the Markdown preview (a per-block ` engine=… ` still overrides it).
 
+**Conflict warning.** Because a remembered selection outranks an in-file
+directive, they can disagree. When they do, the extension raises a **Warning**
+on the `// engine:` line (yellow squiggle + Problems panel) — e.g. *“This file
+declares engine "neato", but a remembered selection "fdp" is overriding it.”* —
+with a **Quick Fix** (`Ctrl+.`) to clear the remembered override so the declared
+engine takes effect. (The syntax grammar itself can't detect this — it's
+stateless; the check is a language diagnostic.)
+
 ## Building from source
 
 This package lives in the [`dot-plugins`](../..) pnpm workspace.
