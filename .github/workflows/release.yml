@@ -1,9 +1,11 @@
 name: Release
 
-# Changesets flow: pushes to main open/update a "Version Packages" PR that bumps
-# versions + changelogs from the .changeset/ entries; merging it publishes the
-# changed packages to npm. Requires the repo secret NPM_TOKEN (an npm automation
-# token for the @knowvah scope).
+# Changesets + npm Trusted Publishing (OIDC). Pushes to main open/update a
+# "Version Packages" PR that bumps versions + changelogs from the .changeset/
+# entries; merging it publishes the changed packages to npm via OIDC — no
+# long-lived NPM_TOKEN. Each @knowvah/* package needs a trusted publisher
+# configured on npmjs.com: repo knowvah/dot-plugins, workflow release.yml,
+# environment "release". npm publishes provenance attestations automatically.
 on:
   push:
     branches:
@@ -14,10 +16,11 @@ concurrency: release-${{ github.ref }}
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       contents: write
       pull-requests: write
-      id-token: write # npm provenance
+      id-token: write # OIDC trusted publishing + provenance
     steps:
       - uses: actions/checkout@v4
 
@@ -31,9 +34,15 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
+      # Trusted publishing (OIDC) requires npm >= 11.5.1.
+      - run: npm install -g npm@latest
+
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm -r typecheck && pnpm -r test
+        env:
+          GV_FONT_QUIET: '1'
+          GV_TEXT_MEASURER: estimate
 
       - uses: changesets/action@v1
         with:
@@ -41,5 +50,3 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
