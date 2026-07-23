@@ -44,12 +44,15 @@ echo "Publishing as npm user: $(npm whoami)"
 echo "==> Installing dependencies (frozen lockfile)"
 pnpm install --frozen-lockfile
 
+# Build first: adapter packages resolve @knowvah/dot-core's types via its
+# exports -> dist/*.d.ts. Typecheck before build fails on a clean checkout with
+# "Cannot find module '@knowvah/dot-core'".
+echo "==> Build"
+pnpm -r build
+
 echo "==> Typecheck + test"
 GV_FONT_QUIET=1 GV_TEXT_MEASURER=estimate pnpm -r typecheck
 GV_FONT_QUIET=1 GV_TEXT_MEASURER=estimate pnpm -r test
-
-echo "==> Build"
-pnpm -r build
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "==> Dry run — no packages will be published:"

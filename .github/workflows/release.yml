@@ -39,6 +39,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Build first: adapter packages resolve @knowvah/dot-core's types via its
+      # exports -> dist/*.d.ts, which don't exist on a clean checkout. Typecheck
+      # before build fails with "Cannot find module '@knowvah/dot-core'".
+      - run: pnpm -r build
+
       - run: pnpm -r typecheck && pnpm -r test
         env:
           GV_FONT_QUIET: '1'
