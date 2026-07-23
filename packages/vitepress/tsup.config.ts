@@ -15,6 +15,7 @@ export default defineConfig({
   external: [
     '@knowvah/dot-core',
     '@knowvah/dot-core/browser',
+    '@knowvah/dot-markdown-it',
     'graphviz-ts',
     'vitepress',
     'markdown-it',

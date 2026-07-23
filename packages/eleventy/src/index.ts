@@ -1,6 +1,7 @@
 /**
- * Eleventy (11ty) plugin: render Graphviz DOT fenced code blocks to inline SVG
- * at build time, using the framework-agnostic `@knowvah/dot-core` engine.
+ * Eleventy (11ty) plugin: render Graphviz DOT fenced code blocks — to inline SVG
+ * at build time (default), or (with `client`) to a `<dot-diagram>` web component
+ * rendered in the browser — via the shared `@knowvah/dot-markdown-it` plugin.
  *
  * ```js
  * // eleventy.config.js
@@ -11,51 +12,26 @@
  * }
  * ```
  *
- * Include the stylesheet in your layout (or copy it into your assets):
- * `@knowvah/eleventy-plugin-dot/style.css`.
+ * Include the stylesheet (`@knowvah/eleventy-plugin-dot/style.css`). For
+ * client-mode blocks, register the web component in your site's browser JS:
  *
- * Eleventy is a static generator, so this plugin renders at build time only.
- * `client`-mode blocks are treated as `no-render` (delegated to normal
- * highlighting) for now.
+ * ```js
+ * import { defineDotDiagram } from '@knowvah/eleventy-plugin-dot/client';
+ * defineDotDiagram();
+ * ```
  */
 import type MarkdownIt from 'markdown-it';
-import type { EngineName } from 'graphviz-ts';
-import {
-  parseFenceInfo,
-  renderDotHtml,
-  resolveConfig,
-  type DotPluginOptions,
-} from '@knowvah/dot-core';
+import { dotMarkdown, type DotPluginOptions } from '@knowvah/dot-markdown-it';
 
-export { parseFenceInfo } from '@knowvah/dot-core';
+export { parseFenceInfo } from '@knowvah/dot-markdown-it';
 export type { DotPluginOptions } from '@knowvah/dot-core';
 
-type FenceRule = NonNullable<MarkdownIt['renderer']['rules']['fence']>;
-
-/**
- * Install a build-mode DOT fence renderer onto a markdown-it instance.
- * Non-DOT blocks — and `no-render` / `client` blocks — delegate to the existing
- * fence rule untouched.
- */
+/** Install the DOT fence renderer onto a markdown-it instance. */
 export function installDotFence(
   md: MarkdownIt,
   options: DotPluginOptions = {},
 ): void {
-  const cfg = resolveConfig(options);
-  const fallback: FenceRule = (tokens, idx, opts, _env, self) =>
-    self.renderToken(tokens, idx, opts);
-  const delegate = md.renderer.rules.fence ?? fallback;
-
-  md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
-    const token = tokens[idx];
-    const info = parseFenceInfo(token.info);
-    const clientRequested = (info.mode ?? cfg.mode) === 'client';
-    if (info.lang !== cfg.renderLanguage || info.noRender || clientRequested) {
-      return delegate(tokens, idx, opts, env, self);
-    }
-    const engine = (info.engine ?? cfg.defaultEngine) as EngineName;
-    return renderDotHtml(token.content, engine, cfg);
-  };
+  dotMarkdown(md, options);
 }
 
 /** Minimal structural view of Eleventy's config — avoids depending on
@@ -73,5 +49,5 @@ export default function eleventyPluginDot(
   eleventyConfig: EleventyConfig,
   options: DotPluginOptions = {},
 ): void {
-  eleventyConfig.amendLibrary('md', (md) => installDotFence(md, options));
+  eleventyConfig.amendLibrary('md', (md) => dotMarkdown(md, options));
 }

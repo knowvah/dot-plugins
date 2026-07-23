@@ -72,10 +72,41 @@ importers:
       '@knowvah/dot-core':
         specifier: workspace:*
         version: link:../core
+      '@knowvah/dot-markdown-it':
+        specifier: workspace:*
+        version: link:../markdown-it
     devDependencies:
       '@11ty/eleventy':
         specifier: ^3.0.0
         version: 3.1.6
+      '@types/markdown-it':
+        specifier: ^14.1.2
+        version: 14.1.2
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      graphviz-ts:
+        specifier: ^0.1.0
+        version: 0.1.26072117
+      markdown-it:
+        specifier: ^14.1.0
+        version: 14.3.0
+      tsup:
+        specifier: ^8.5.0
+        version: 8.5.1(postcss@8.5.22)(typescript@6.0.3)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.7(@types/node@22.20.1)(jsdom@25.0.1)
+
+  packages/markdown-it:
+    dependencies:
+      '@knowvah/dot-core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
       '@types/markdown-it':
         specifier: ^14.1.2
         version: 14.1.2
@@ -103,6 +134,9 @@ importers:
       '@knowvah/dot-core':
         specifier: workspace:*
         version: link:../core
+      '@knowvah/dot-markdown-it':
+        specifier: workspace:*
+        version: link:../markdown-it
     devDependencies:
       '@types/markdown-it':
         specifier: ^14.1.2

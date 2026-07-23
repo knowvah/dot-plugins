@@ -1,28 +1,23 @@
 /**
- * markdown-it plugin: render Graphviz DOT fenced code blocks — to inline SVG at
- * build time (default), or to a client-side `<DotDiagram>` component — using the
- * framework-agnostic `@knowvah/dot-core` engine.
+ * VitePress markdown-it adapter — a thin wrapper over `@knowvah/dot-markdown-it`
+ * that emits VitePress's `<ClientOnly><DotDiagram>` (a Vue component) for
+ * client-mode blocks. Build mode and delegation are handled by the shared plugin.
  *
  * Use it directly via VitePress's `markdown.config`, or use the {@link withDot}
  * wrapper from the package root.
  */
 import type MarkdownIt from 'markdown-it';
 import type { EngineName } from 'graphviz-ts';
-import {
-  escapeHtml,
-  parseFenceInfo,
-  renderDotHtml,
-  resolveConfig,
-  type DotPluginOptions,
-  type ResolvedConfig,
-} from '@knowvah/dot-core';
+import { escapeHtml, type ResolvedConfig } from '@knowvah/dot-core';
+import { dotMarkdown as dotMarkdownBase } from '@knowvah/dot-markdown-it';
+import type { DotPluginOptions } from '@knowvah/dot-core';
 
-export { parseFenceInfo } from '@knowvah/dot-core';
+export { parseFenceInfo } from '@knowvah/dot-markdown-it';
 export type { DotPluginOptions, RenderMode } from '@knowvah/dot-core';
 
-/** Client mode: emit a `<DotDiagram>` component (rendered in the browser).
- * Requires the component registered in the VitePress theme's `enhanceApp`. */
-function renderClient(
+/** Client mode: emit VitePress's Vue component, deferred with `<ClientOnly>`.
+ * Requires `DotDiagram` registered in the theme's `enhanceApp`. */
+function emitVitePressClient(
   dot: string,
   engine: EngineName,
   cfg: ResolvedConfig,
@@ -38,36 +33,15 @@ function renderClient(
   return `<ClientOnly><DotDiagram ${attrs}></DotDiagram></ClientOnly>\n`;
 }
 
-type FenceRule = NonNullable<MarkdownIt['renderer']['rules']['fence']>;
-
-const fallbackFence: FenceRule = (tokens, idx, opts, _env, self) =>
-  self.renderToken(tokens, idx, opts);
-
 /**
  * Install the DOT renderer onto a markdown-it instance. Preserves any existing
- * `fence` rule and delegates to it for non-DOT blocks (so syntax highlighting
- * of other languages — and of opted-out ```` ```dot no-render ```` blocks — is
- * untouched).
+ * `fence` rule and delegates non-DOT / `no-render` blocks to it.
  */
 export function dotMarkdown(
   md: MarkdownIt,
   options: DotPluginOptions = {},
 ): void {
-  const cfg = resolveConfig(options);
-  const delegate = md.renderer.rules.fence ?? fallbackFence;
-
-  md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
-    const token = tokens[idx];
-    const info = parseFenceInfo(token.info);
-    if (info.lang !== cfg.renderLanguage || info.noRender) {
-      return delegate(tokens, idx, opts, env, self);
-    }
-    const engine = (info.engine ?? cfg.defaultEngine) as EngineName;
-    const mode = info.mode ?? cfg.mode;
-    return mode === 'client'
-      ? renderClient(token.content, engine, cfg)
-      : renderDotHtml(token.content, engine, cfg);
-  };
+  dotMarkdownBase(md, { ...options, emitClient: emitVitePressClient });
 }
 
 export default dotMarkdown;

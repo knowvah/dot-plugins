@@ -30,6 +30,10 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./client": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    },
     "./style.css": "./dist/style.css"
   },
   "scripts": {
@@ -40,7 +44,8 @@
     "demo:build": "eleventy --input=demo --output=demo/_site --config=demo/eleventy.config.js"
   },
   "dependencies": {
-    "@knowvah/dot-core": "workspace:*"
+    "@knowvah/dot-core": "workspace:*",
+    "@knowvah/dot-markdown-it": "workspace:*"
   },
   "peerDependencies": {
     "@11ty/eleventy": ">=2.0.0",

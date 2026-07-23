@@ -38,9 +38,14 @@ describe('installDotFence (build mode)', () => {
     expect(out).toContain('const x = 1;');
   });
 
-  it('delegates no-render and client blocks (11ty is build-only)', () => {
+  it('delegates no-render blocks (kept as source)', () => {
     expect(render('dot no-render', 'digraph{a->b}')).not.toContain('<svg');
-    expect(render('dot client', 'digraph{a->b}')).not.toContain('<svg');
+  });
+
+  it('emits a <dot-diagram> web component for client blocks', () => {
+    const out = render('dot client', 'digraph{a->b}');
+    expect(out).toContain('<dot-diagram ');
+    expect(out).not.toContain('<svg');
   });
 
   it('respects renderLanguage', () => {

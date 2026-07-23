@@ -49,12 +49,21 @@ your CSS build): `@knowvah/eleventy-plugin-dot/style.css`.
 ## Options
 
 Same as [`@knowvah/dot-core`](../core)'s `DotPluginOptions`: `renderLanguage`,
-`defaultEngine`, `wrapperClass`, `timeout` (child-process safe-mode for untrusted
-DOT), `onError` (`panel` | `throw`), and `useCurrentColor` (theme-aware colors).
-Per-block: `` ```dot engine=neato `` and `` ```dot no-render ``.
+`mode` (`build` | `client`), `defaultEngine`, `wrapperClass`, `timeout`
+(child-process safe-mode for untrusted DOT), `onError` (`panel` | `throw`), and
+`useCurrentColor` (theme-aware colors). Per-block: `` ```dot engine=neato ``,
+`` ```dot no-render ``, `` ```dot client ``.
 
-**Build-only for now:** `client`-mode blocks are treated as `no-render`
-(delegated to normal highlighting). A client (web-component) mode may follow.
+## Client mode
+
+Build mode is the default (static SVG). For `` ```dot client `` blocks (or
+`mode: 'client'`), the plugin emits a framework-neutral `<dot-diagram>` web
+component that renders in the browser — register it once in your site's JS:
+
+```js
+import { defineDotDiagram } from '@knowvah/eleventy-plugin-dot/client';
+defineDotDiagram();
+```
 
 ## License
 

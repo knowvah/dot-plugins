@@ -1,0 +1,59 @@
+{
+  "name": "@knowvah/dot-markdown-it",
+  "version": "0.1.0",
+  "description": "markdown-it plugin: render Graphviz DOT fenced code blocks to inline SVG (build time) or a client component — shared by the VitePress and Eleventy DOT plugins. Powered by the pure-TypeScript graphviz-ts engine.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "markdown-it",
+    "markdown-it-plugin",
+    "graphviz",
+    "dot",
+    "svg",
+    "graphviz-ts"
+  ],
+  "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/markdown-it#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knowvah/dot-plugins.git",
+    "directory": "packages/markdown-it"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@knowvah/dot-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "graphviz-ts": ">=0.1.0"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.0.0",
+    "graphviz-ts": "^0.1.0",
+    "markdown-it": "^14.1.0",
+    "tsup": "^8.5.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.12.0"
+  }
+}
