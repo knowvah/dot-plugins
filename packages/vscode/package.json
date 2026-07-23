@@ -29,6 +29,10 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": [
+      "./media/dot-preview.css"
+    ],
     "languages": [
       {
         "id": "dot",
@@ -92,11 +96,14 @@
   },
   "devDependencies": {
     "@knowvah/dot-core": "workspace:*",
+    "@knowvah/dot-markdown-it": "workspace:*",
+    "@types/markdown-it": "^14.0.0",
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.24.0",
     "graphviz-ts": "^0.1.0",
+    "markdown-it": "^14.0.0",
     "typescript": "^6.0.3",
     "vitest": "^3.0.0"
   }

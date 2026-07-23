@@ -10,8 +10,12 @@ no external Graphviz install, no `dot` binary on your PATH, no network.
 
 - **Syntax highlighting** for `.dot` and `.gv` (a TextMate grammar for
   `source.dot`), plus comment/bracket editing behavior.
-- **Live preview** — `DOT: Open Preview to the Side` renders the active file to
-  inline SVG in a webview beside the editor and re-renders as you type.
+- **Live file preview** — `DOT: Open Preview to the Side` renders the active
+  file to inline SVG in a webview beside the editor and re-renders as you type.
+- **Markdown preview** — ` ```dot ` fenced code blocks render as inline SVG in
+  VS Code's built-in Markdown preview (build-time, no client scripts). Per-block
+  directives work: ` ```dot engine=neato `, ` ```dot no-render ` (leave as a
+  highlighted code block).
 - **Theme-aware** — diagrams inherit the editor's foreground color (black
   strokes/text are remapped to `currentColor`), so they read correctly in light
   and dark themes.
@@ -55,10 +59,16 @@ language association are declarative (`package.json` `contributes`).
   hang the extension host until the window is reloaded. graphviz-ts's own
   documented infinite-loop cases are rare; a future version can move rendering
   to a terminable worker with a timeout.
-- **No per-file engine selection yet** — the preview always uses the `dot`
-  layout engine. (`neato`/`fdp`/`circo`/… support is a natural follow-up.)
-- Markdown-preview support for ` ```dot ` fenced blocks is a separate,
-  planned feature (it reuses `@knowvah/dot-markdown-it`).
+- **No per-file engine selection in the file preview yet** — the standalone
+  `.dot`/`.gv` preview always uses the `dot` engine. (The Markdown preview does
+  honor a per-block ` engine=… ` directive.)
+- **HTML labels in the Markdown preview.** VS Code's built-in Markdown preview
+  sanitizes rendered HTML (DOMPurify). Standard SVG shapes and text render, but
+  `<foreignObject>` — which Graphviz emits for HTML-like labels
+  (`label=<<table>…>>`) — is stripped by the sanitizer, so those labels won't
+  show *in the Markdown preview*. Plain (string-label) graphs are unaffected,
+  and the standalone **file preview** renders HTML labels correctly (it's the
+  extension's own webview, not subject to the Markdown preview sanitizer).
 
 ## Licensing
 

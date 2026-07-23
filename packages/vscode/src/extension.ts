@@ -7,12 +7,19 @@
  * file only adds the preview.
  */
 import * as path from 'node:path';
+import type MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
 import { renderPreviewHtml } from './preview.js';
+import { extendMarkdownIt } from './markdown.js';
 
 const VIEW_TYPE = 'dot.preview';
 
-export function activate(context: vscode.ExtensionContext): void {
+/** The API VS Code reads from `activate()` to extend the Markdown preview. */
+export interface DotExtensionApi {
+  extendMarkdownIt(md: MarkdownIt): MarkdownIt;
+}
+
+export function activate(context: vscode.ExtensionContext): DotExtensionApi {
   // One reusable preview panel per source document, keyed by URI.
   const panels = new Map<string, vscode.WebviewPanel>();
 
@@ -47,6 +54,9 @@ export function activate(context: vscode.ExtensionContext): void {
       if (panel !== undefined) update(panel, e.document);
     }),
   );
+
+  // Contribute the DOT fence renderer to VS Code's built-in Markdown preview.
+  return { extendMarkdownIt };
 }
 
 export function deactivate(): void {

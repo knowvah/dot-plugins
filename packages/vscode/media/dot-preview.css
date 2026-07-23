@@ -1,0 +1,26 @@
+/* Styles for `.dot-diagram` blocks in VS Code's built-in Markdown preview.
+   Contributed via `markdown.previewStyles`. The SVG is inline; `currentColor`
+   (from the plugin's use-current-color remap) inherits the preview's text
+   color, so diagrams stay readable in light and dark themes. */
+
+.dot-diagram {
+  overflow-x: auto;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.dot-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.dot-diagram-error {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #e5534b);
+  border-radius: 6px;
+  background: var(--vscode-inputValidation-errorBackground, rgba(229, 83, 75, 0.1));
+  color: var(--vscode-errorForeground, #e5534b);
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+}
