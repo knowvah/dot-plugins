@@ -16,6 +16,7 @@ each generator gets a thin adapter package, and app frameworks get a component.
 | [`@knowvah/docusaurus-plugin-dot`](packages/docusaurus) | Docusaurus (MDX/remark) | ✅ build-time SSR + client mode |
 | [`@knowvah/dot-markdown-it`](packages/markdown-it) | any markdown-it host | ✅ build + client |
 | [`@knowvah/dot-react`](packages/react) | React apps (`<DotDiagram>`) | ✅ client component |
+| [`dot-vscode`](packages/vscode) | VS Code editor | ✅ `.dot`/`.gv` syntax + live preview |
 
 **Angular · Svelte · Solid · plain HTML:** use the framework-neutral
 `<dot-diagram>` web component from `@knowvah/dot-core/element` — no dedicated
@@ -44,3 +45,7 @@ merging it publishes the changed packages to npm. Requires a free `knowvah` npm
 org and the repo secret `NPM_TOKEN` (an npm automation token). `@knowvah/dot-core`
 publishes first; the adapters' `workspace:*` dep on it is rewritten to the real
 version at publish time.
+
+The `dot-vscode` extension is `private` (excluded from the npm release). It
+publishes separately to the VS Code Marketplace / Open VSX via
+`pnpm --filter dot-vscode package` → `vsce publish` / `ovsx publish`.

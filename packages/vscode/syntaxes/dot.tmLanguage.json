@@ -1,0 +1,63 @@
+{
+  "information_for_contributors": [
+    "This grammar (scope source.dot) is licensed EPL-2.0 — it is reused verbatim from graphviz-ts, and retains that project's license rather than the MIT license of the rest of this extension. See the extension README's Licensing section."
+  ],
+  "name": "dot",
+  "scopeName": "source.dot",
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#keyword" },
+    { "include": "#string" },
+    { "include": "#operator" },
+    { "include": "#number" },
+    { "include": "#attribute" }
+  ],
+  "repository": {
+    "comment": {
+      "patterns": [
+        { "name": "comment.block.dot", "begin": "/\\*", "end": "\\*/" },
+        { "name": "comment.line.double-slash.dot", "match": "//.*$" },
+        { "name": "comment.line.number-sign.dot", "match": "^\\s*#.*$" }
+      ]
+    },
+    "keyword": {
+      "patterns": [
+        {
+          "name": "keyword.control.dot",
+          "match": "(?i)\\b(strict|graph|digraph|subgraph|node|edge)\\b"
+        }
+      ]
+    },
+    "string": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.dot",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            { "name": "constant.character.escape.dot", "match": "\\\\." }
+          ]
+        }
+      ]
+    },
+    "operator": {
+      "patterns": [
+        { "name": "keyword.operator.edge.dot", "match": "->|--" },
+        { "name": "keyword.operator.assignment.dot", "match": "=" }
+      ]
+    },
+    "number": {
+      "patterns": [
+        { "name": "constant.numeric.dot", "match": "\\b-?\\d+(\\.\\d+)?\\b" }
+      ]
+    },
+    "attribute": {
+      "patterns": [
+        {
+          "name": "variable.other.dot",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    }
+  }
+}

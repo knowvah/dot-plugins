@@ -1,0 +1,10 @@
+# Source & tooling — the extension ships only the bundled dist/ output.
+src/**
+node_modules/**
+.vscode/**
+tsconfig.json
+esbuild.config.mjs
+**/*.test.ts
+**/*.map
+.gitignore
+vitest.config.*

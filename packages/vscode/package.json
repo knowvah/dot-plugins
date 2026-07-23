@@ -1,0 +1,103 @@
+{
+  "name": "dot-vscode",
+  "displayName": "DOT (Graphviz) Preview & Syntax",
+  "description": "Syntax highlighting and live SVG preview for Graphviz DOT (.dot / .gv) files — powered by the pure-TypeScript graphviz-ts engine.",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "publisher": "knowvah",
+  "categories": [
+    "Programming Languages",
+    "Visualization"
+  ],
+  "keywords": [
+    "graphviz",
+    "dot",
+    "gv",
+    "diagram",
+    "preview",
+    "graphviz-ts"
+  ],
+  "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/vscode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knowvah/dot-plugins.git",
+    "directory": "packages/vscode"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "dot",
+        "aliases": [
+          "Graphviz (DOT)",
+          "dot",
+          "graphviz"
+        ],
+        "extensions": [
+          ".dot",
+          ".gv"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dot",
+        "scopeName": "source.dot",
+        "path": "./syntaxes/dot.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "dot.showPreview",
+        "title": "Open Preview to the Side",
+        "category": "DOT",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceLangId == dot",
+          "command": "dot.showPreview",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "dot.showPreview",
+          "when": "resourceLangId == dot"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "dot.showPreview",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "resourceLangId == dot && editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "dev": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "package": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@knowvah/dot-core": "workspace:*",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "graphviz-ts": "^0.1.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  }
+}
