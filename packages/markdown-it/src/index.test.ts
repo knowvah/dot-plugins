@@ -27,6 +27,11 @@ describe('dotMarkdown — build mode', () => {
   it('honors a per-block engine', () => {
     expect(render('dot engine=neato', 'graph{a--b--c--a}')).toContain('<svg');
   });
+  it('accepts a mixed-case engine name (normalized)', () => {
+    const out = render('dot engine=NEATO', 'graph{a--b--c--a}');
+    expect(out).toContain('<svg');
+    expect(out).not.toContain('dot-diagram-error');
+  });
 });
 
 describe('dotMarkdown — client mode', () => {

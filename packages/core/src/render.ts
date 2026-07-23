@@ -12,6 +12,7 @@ import type { EngineName, GvError, RenderResult } from 'graphviz-ts';
 import {
   currentColorRemap,
   escapeHtml,
+  normalizeEngine,
   toInlineSvg,
   type DotPluginOptions,
   type RenderMode,
@@ -129,7 +130,9 @@ export function resolveConfig(options: DotPluginOptions): ResolvedConfig {
   const provided = Object.fromEntries(
     Object.entries(options).filter((entry) => entry[1] !== undefined),
   );
-  return { ...CONFIG_DEFAULTS, ...provided } as ResolvedConfig;
+  const cfg = { ...CONFIG_DEFAULTS, ...provided } as ResolvedConfig;
+  cfg.defaultEngine = normalizeEngine(cfg.defaultEngine) as EngineName;
+  return cfg;
 }
 
 /** A build render: the inline SVG string on success, else the first error. */
@@ -149,9 +152,10 @@ export function renderDotSvg(
   engine: EngineName,
   cfg: ResolvedConfig,
 ): DotSvgResult {
+  const eng = normalizeEngine(engine) as EngineName; // case-insensitive engine names
   const result: RenderResult = cfg.timeout
-    ? renderInChild(dot, engine, cfg.timeout)
-    : tryRenderSvg(dot, engine);
+    ? renderInChild(dot, eng, cfg.timeout)
+    : tryRenderSvg(dot, eng);
 
   if (result.svg != null) {
     const inline = toInlineSvg(result.svg);

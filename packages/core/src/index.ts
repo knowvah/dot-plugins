@@ -11,6 +11,7 @@
 export {
   parseFenceInfo,
   escapeHtml,
+  normalizeEngine,
   toInlineSvg,
   currentColorRemap,
   type DotPluginOptions,

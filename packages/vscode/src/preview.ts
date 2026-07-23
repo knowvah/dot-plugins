@@ -4,7 +4,7 @@
  * `vscode` dependency and no rendering (that runs in a terminable worker; see
  * `render-service.ts`), so this stays trivially unit-testable.
  */
-import { escapeHtml } from '@knowvah/dot-core';
+import { escapeHtml, normalizeEngine } from '@knowvah/dot-core';
 import type { BuiltinEngine } from 'graphviz-ts';
 
 /** A rendered preview: either inline SVG, or a human-readable error message. */
@@ -57,7 +57,7 @@ export function findEngineDirective(dot: string): EngineDirective | undefined {
     if (!isLineComment(trimmed)) break; // reached the graph body
     const match = ENGINE_DIRECTIVE.exec(lines[i]); // raw line → correct columns
     if (match !== null) {
-      const name = match[1].toLowerCase() as BuiltinEngine;
+      const name = normalizeEngine(match[1]) as BuiltinEngine;
       if (BUILTIN_ENGINES.includes(name)) {
         return { engine: name, line: i, start: match.index, end: match.index + match[0].length };
       }

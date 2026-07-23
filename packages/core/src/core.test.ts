@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseFenceInfo,
+  normalizeEngine,
   toInlineSvg,
   currentColorRemap,
   resolveConfig,
@@ -8,6 +9,14 @@ import {
   type ResolvedConfig,
 } from './index.js';
 import { renderDiagram } from './browser.js';
+
+describe('normalizeEngine', () => {
+  it('lowercases and trims engine names', () => {
+    expect(normalizeEngine('NEATO')).toBe('neato');
+    expect(normalizeEngine('  Fdp  ')).toBe('fdp');
+    expect(normalizeEngine('dot')).toBe('dot');
+  });
+});
 
 describe('parseFenceInfo', () => {
   it('extracts the language', () => {
@@ -21,6 +30,10 @@ describe('parseFenceInfo', () => {
   });
   it('tolerates the {brace} form (non-VitePress hosts)', () => {
     expect(parseFenceInfo('dot {engine=neato}')).toMatchObject({ engine: 'neato' });
+  });
+  it('normalizes the engine name (case-insensitive)', () => {
+    expect(parseFenceInfo('dot engine=NEATO')).toMatchObject({ engine: 'neato' });
+    expect(parseFenceInfo('dot engine="Circo"')).toMatchObject({ engine: 'circo' });
   });
   it('detects no-render / client / build flags', () => {
     expect(parseFenceInfo('dot no-render').noRender).toBe(true);
@@ -70,6 +83,12 @@ describe('renderDotHtml (build-mode render)', () => {
     expect(html).not.toContain('stroke="black"');
   });
 
+  it('accepts a mixed-case engine name (normalized before rendering)', () => {
+    const html = renderDotHtml('graph { a -- b }', 'NEATO' as never, CFG);
+    expect(html).toContain('<svg');
+    expect(html).not.toContain('dot-diagram-error');
+  });
+
   it('timeout safe-mode: renders a normal graph via the child process', () => {
     const cfg = resolveConfig({ timeout: 15000 });
     expect(renderDotHtml('digraph { a -> b }', 'dot', cfg)).toContain('<svg');
@@ -100,5 +119,20 @@ describe('renderDiagram (browser render)', () => {
   it('applies currentColor when requested', async () => {
     const state = await renderDiagram('digraph { a -> b }', 'dot', true);
     expect(state.svg).toContain('currentColor');
+  });
+
+  it('accepts a mixed-case engine name', async () => {
+    const state = await renderDiagram('graph { a -- b }', 'Neato', false);
+    expect(state.error).toBeUndefined();
+    expect(state.svg).toContain('<svg');
+  });
+});
+
+describe('resolveConfig', () => {
+  it('normalizes defaultEngine (case-insensitive)', () => {
+    expect(resolveConfig({ defaultEngine: 'FDP' as never }).defaultEngine).toBe('fdp');
+  });
+  it('defaults defaultEngine to dot', () => {
+    expect(resolveConfig({}).defaultEngine).toBe('dot');
   });
 });

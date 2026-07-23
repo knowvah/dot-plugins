@@ -19,7 +19,7 @@ npm i @knowvah/dot-core graphviz-ts
 
 | Import | Environment | Exports |
 | --- | --- | --- |
-| `@knowvah/dot-core` | Node / build | `renderDotHtml`, `resolveConfig`, `parseFenceInfo`, `escapeHtml`, `toInlineSvg`, `currentColorRemap`, types |
+| `@knowvah/dot-core` | Node / build | `renderDotHtml`, `resolveConfig`, `parseFenceInfo`, `normalizeEngine`, `escapeHtml`, `toInlineSvg`, `currentColorRemap`, types |
 | `@knowvah/dot-core/browser` | browser | `renderDiagram` (async DOT → `{ svg }` \| `{ error }`) |
 | `@knowvah/dot-core/element` | browser | `<dot-diagram>` custom element + `defineDotDiagram()` |
 
@@ -96,6 +96,11 @@ whose `trackBy` returns the DOT string — rather than mutating `graph` in place
 `timeout` (ms; build-mode child-process safe-mode), `onError` (`panel` |
 `throw`), `useCurrentColor`. `parseFenceInfo` reads per-block overrides from a
 fence info-string (`engine=neato`, `no-render`, `client` / `build`).
+
+**Engine names are case-insensitive.** They are normalized (trimmed +
+lowercased) at every entry point — `parseFenceInfo`, `resolveConfig`, and both
+render functions — so `engine=Neato`, `NEATO`, and `neato` are equivalent
+wherever an engine is accepted. `normalizeEngine(name)` is exported for reuse.
 
 ## License
 

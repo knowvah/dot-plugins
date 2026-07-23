@@ -9,6 +9,7 @@
 import * as path from 'node:path';
 import type { BuiltinEngine } from 'graphviz-ts';
 import * as vscode from 'vscode';
+import { normalizeEngine } from '@knowvah/dot-core';
 import {
   previewDocument,
   parseEngineDirective,
@@ -31,9 +32,9 @@ function isBuiltinEngine(name: string | undefined): name is BuiltinEngine {
 
 /** The configured default engine (`dot.preview.defaultEngine`), validated. */
 export function configuredDefaultEngine(): BuiltinEngine {
-  const name = vscode.workspace
-    .getConfiguration('dot')
-    .get<string>('preview.defaultEngine', 'dot');
+  const name = normalizeEngine(
+    vscode.workspace.getConfiguration('dot').get<string>('preview.defaultEngine', 'dot'),
+  );
   return isBuiltinEngine(name) ? name : 'dot';
 }
 

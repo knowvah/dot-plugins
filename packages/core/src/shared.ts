@@ -65,6 +65,16 @@ export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ESCAPE_MAP[c]);
 }
 
+/**
+ * Normalize a layout-engine name for case-insensitive matching. Graphviz engine
+ * names are lowercase (`dot`, `neato`, …) and graphviz-ts throws on any other
+ * spelling, so callers should normalize user-supplied names (`Neato`, `FDP`)
+ * before rendering or comparing.
+ */
+export function normalizeEngine(engine: string): string {
+  return engine.trim().toLowerCase();
+}
+
 /** A parsed fence info-string. */
 export interface ParsedFence {
   lang: string;
@@ -79,7 +89,8 @@ export function parseFenceInfo(info: string): ParsedFence {
   const sp = trimmed.search(/\s/);
   const lang = sp === -1 ? trimmed : trimmed.slice(0, sp);
   const rest = sp === -1 ? '' : trimmed.slice(sp + 1);
-  const engine = rest.match(/\bengine\s*=\s*["']?([A-Za-z][\w-]*)["']?/)?.[1];
+  const rawEngine = rest.match(/\bengine\s*=\s*["']?([A-Za-z][\w-]*)["']?/)?.[1];
+  const engine = rawEngine === undefined ? undefined : normalizeEngine(rawEngine);
   let mode: RenderMode | undefined;
   if (/\bclient\b/.test(rest)) mode = 'client';
   else if (/\bbuild\b/.test(rest)) mode = 'build';
