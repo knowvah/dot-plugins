@@ -9,3 +9,5 @@ dist
 .serena/
 .mcp.json
 .agent-notes/
+
+.serena/cache/
