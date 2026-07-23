@@ -132,28 +132,49 @@ export function resolveConfig(options: DotPluginOptions): ResolvedConfig {
   return { ...CONFIG_DEFAULTS, ...provided } as ResolvedConfig;
 }
 
+/** A build render: the inline SVG string on success, else the first error. */
+export interface DotSvgResult {
+  svg?: string;
+  error?: GvError;
+}
+
 /**
- * Build-mode render: a DOT block becomes an inline-SVG wrapper `<div>`, or —
- * on failure — an error panel (default) or a thrown build error.
+ * Build-mode render returning the inline SVG string (standalone-doc prolog
+ * stripped, `currentColor` applied when requested) or the first error. This is
+ * the framework-agnostic core; wrap it however the host needs (an HTML string,
+ * a JSX `dangerouslySetInnerHTML`, etc.).
  */
-export function renderDotHtml(
+export function renderDotSvg(
   dot: string,
   engine: EngineName,
   cfg: ResolvedConfig,
-): string {
+): DotSvgResult {
   const result: RenderResult = cfg.timeout
     ? renderInChild(dot, engine, cfg.timeout)
     : tryRenderSvg(dot, engine);
 
   if (result.svg != null) {
     const inline = toInlineSvg(result.svg);
-    const svg = cfg.useCurrentColor ? currentColorRemap(inline) : inline;
+    return { svg: cfg.useCurrentColor ? currentColorRemap(inline) : inline };
+  }
+  return { error: result.errors?.[0] };
+}
+
+/**
+ * Build-mode render to HTML: an inline-SVG wrapper `<div>`, or — on failure —
+ * an error panel (default) or a thrown build error.
+ */
+export function renderDotHtml(
+  dot: string,
+  engine: EngineName,
+  cfg: ResolvedConfig,
+): string {
+  const { svg, error } = renderDotSvg(dot, engine, cfg);
+  if (svg != null) {
     return `<div class="${escapeHtml(cfg.wrapperClass)}">${svg}</div>\n`;
   }
-
-  const err = result.errors?.[0];
   if (cfg.onError === 'throw') {
-    throw new Error(`[dot-core] ${err?.message ?? 'render failed'}`);
+    throw new Error(`[dot-core] ${error?.message ?? 'render failed'}`);
   }
-  return errorPanel(err, cfg.wrapperClass);
+  return errorPanel(error, cfg.wrapperClass);
 }

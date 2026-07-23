@@ -1,11 +1,9 @@
 /**
- * Docusaurus (MDX) support: a **remark plugin** that rewrites ` ```dot ` fenced
- * code blocks into a `<DotDiagram>` JSX element, rendered in the browser by the
- * companion React component ({@link @knowvah/docusaurus-plugin-dot/client}).
- *
- * Docusaurus renders through MDX, which parses raw HTML as JSX — and Graphviz
- * SVG carries non-JSX attributes — so v1 renders client-side rather than
- * injecting static SVG at build.
+ * Docusaurus (MDX) support: a **remark plugin** that renders ` ```dot ` fenced
+ * code blocks either at **build time** (default — a static `<div>` whose SVG is
+ * injected via `dangerouslySetInnerHTML`, so it ends up in the SSR'd HTML with
+ * no client JS) or **client-side** (` ```dot client ` / `mode: 'client'` — a
+ * `<DotDiagram>` React component). Non-DOT and `no-render` blocks are left alone.
  *
  * ```ts
  * // docusaurus.config.ts
@@ -16,41 +14,125 @@
  *   }]],
  * };
  * ```
- * Then register the component in `src/theme/MDXComponents` and import
- * `@knowvah/docusaurus-plugin-dot/style.css`.
+ * Client mode also needs the component registered in `src/theme/MDXComponents`;
+ * import `@knowvah/docusaurus-plugin-dot/style.css` either way.
  */
 import { visit } from 'unist-util-visit';
 import {
   parseFenceInfo,
+  renderDotSvg,
   resolveConfig,
   type DotPluginOptions,
+  type ResolvedConfig,
 } from '@knowvah/dot-core';
+import type { EngineName } from 'graphviz-ts';
 import type { Root, Code } from 'mdast';
 
 export type { DotPluginOptions } from '@knowvah/dot-core';
 
-// Minimal shape of an MDX JSX flow element (from mdast-util-mdx-jsx), typed
-// locally to avoid a types-only dependency. Only string / boolean attributes
-// are used, so no estree expression AST is needed.
+// Minimal shapes of MDX JSX nodes (from mdast-util-mdx-jsx), typed locally to
+// avoid a types-only dependency.
+interface MdxJsxAttributeValueExpression {
+  type: 'mdxJsxAttributeValueExpression';
+  value: string;
+  data: { estree: unknown };
+}
 interface MdxJsxAttribute {
   type: 'mdxJsxAttribute';
   name: string;
-  value: string | null;
+  value: string | null | MdxJsxAttributeValueExpression;
 }
 interface MdxJsxFlowElement {
   type: 'mdxJsxFlowElement';
   name: string;
   attributes: MdxJsxAttribute[];
-  children: [];
+  children: unknown[];
 }
 
 function attr(name: string, value: string | null): MdxJsxAttribute {
   return { type: 'mdxJsxAttribute', name, value };
 }
 
+/** estree Program for the object expression `{ __html: <html> }`. */
+function htmlObjectEstree(html: string): unknown {
+  const property = {
+    type: 'Property',
+    method: false,
+    shorthand: false,
+    computed: false,
+    kind: 'init',
+    key: { type: 'Identifier', name: '__html' },
+    value: { type: 'Literal', value: html },
+  };
+  const expression = { type: 'ObjectExpression', properties: [property] };
+  return {
+    type: 'Program',
+    sourceType: 'module',
+    comments: [],
+    body: [{ type: 'ExpressionStatement', expression }],
+  };
+}
+
+/** Build the `dangerouslySetInnerHTML={{ __html: "…" }}` JSX attribute, incl.
+ * the estree the MDX compiler needs. */
+function innerHtmlAttr(html: string): MdxJsxAttribute {
+  return {
+    type: 'mdxJsxAttribute',
+    name: 'dangerouslySetInnerHTML',
+    value: {
+      type: 'mdxJsxAttributeValueExpression',
+      value: `{ __html: ${JSON.stringify(html)} }`,
+      data: { estree: htmlObjectEstree(html) },
+    },
+  };
+}
+
+/** Build mode: render the SVG now and inject it into a static `<div>`. */
+function buildElement(
+  dot: string,
+  engine: EngineName,
+  cfg: ResolvedConfig,
+): MdxJsxFlowElement {
+  const { svg, error } = renderDotSvg(dot, engine, cfg);
+  if (svg != null) {
+    return {
+      type: 'mdxJsxFlowElement',
+      name: 'div',
+      attributes: [attr('className', cfg.wrapperClass), innerHtmlAttr(svg)],
+      children: [],
+    };
+  }
+  return {
+    type: 'mdxJsxFlowElement',
+    name: 'div',
+    attributes: [
+      attr('className', `${cfg.wrapperClass}-error`),
+      attr('role', 'alert'),
+    ],
+    children: [
+      { type: 'text', value: error?.friendlyMessage ?? 'Failed to render graph.' },
+    ],
+  };
+}
+
+/** Client mode: emit a `<DotDiagram>` that renders in the browser. */
+function clientElement(
+  dot: string,
+  engine: EngineName,
+  cfg: ResolvedConfig,
+): MdxJsxFlowElement {
+  const attributes: MdxJsxAttribute[] = [
+    attr('graph', encodeURIComponent(dot)),
+    attr('engine', engine),
+    attr('wrapperClass', cfg.wrapperClass),
+  ];
+  if (cfg.useCurrentColor) attributes.push(attr('useCurrentColor', null));
+  return { type: 'mdxJsxFlowElement', name: 'DotDiagram', attributes, children: [] };
+}
+
 /**
- * Remark plugin. Replaces DOT code blocks with a `<DotDiagram>` JSX element;
- * `no-render` and non-DOT blocks are left as normal code blocks.
+ * Remark plugin. Replaces DOT code blocks with build-time SVG (default) or a
+ * `<DotDiagram>` client component; `no-render` and non-DOT blocks are untouched.
  */
 export default function remarkDot(options: DotPluginOptions = {}) {
   const cfg = resolveConfig(options);
@@ -61,20 +143,12 @@ export default function remarkDot(options: DotPluginOptions = {}) {
       const info = parseFenceInfo(`${node.lang ?? ''}${meta}`);
       if (info.lang !== cfg.renderLanguage || info.noRender) return;
 
-      const engine = info.engine ?? cfg.defaultEngine;
-      const attributes: MdxJsxAttribute[] = [
-        attr('graph', encodeURIComponent(node.value)),
-        attr('engine', engine),
-        attr('wrapperClass', cfg.wrapperClass),
-      ];
-      if (cfg.useCurrentColor) attributes.push(attr('useCurrentColor', null));
-
-      const el: MdxJsxFlowElement = {
-        type: 'mdxJsxFlowElement',
-        name: 'DotDiagram',
-        attributes,
-        children: [],
-      };
+      const engine = (info.engine ?? cfg.defaultEngine) as EngineName;
+      const mode = info.mode ?? cfg.mode;
+      const el =
+        mode === 'client'
+          ? clientElement(node.value, engine, cfg)
+          : buildElement(node.value, engine, cfg);
       (parent.children as unknown[])[index] = el;
     });
   };

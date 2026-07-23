@@ -5,10 +5,11 @@ in [Docusaurus](https://docusaurus.io/), powered by the pure-TypeScript
 [graphviz-ts](https://www.npmjs.com/package/graphviz-ts) engine and the shared
 [`@knowvah/dot-core`](../core) render engine.
 
-Docusaurus renders through MDX, which parses raw HTML as JSX — and Graphviz SVG
-carries non-JSX attributes — so v1 renders **client-side**: a remark plugin
-rewrites ` ```dot ` blocks into a `<DotDiagram>` React component that renders in
-the browser on mount. (A build-time SSR mode is a possible follow-up.)
+A remark plugin renders ` ```dot ` blocks. **Build mode** (the default) renders
+the SVG during the build and injects it into a static `<div>` via
+`dangerouslySetInnerHTML` — so it ends up in the SSR'd HTML with no client JS.
+**Client mode** (` ```dot client ` or `mode: 'client'`) emits a `<DotDiagram>`
+React component that renders in the browser instead.
 
 ## Install
 
@@ -20,7 +21,8 @@ npm i -D @knowvah/docusaurus-plugin-dot graphviz-ts
 
 ## Usage
 
-Two steps — add the remark plugin, and register the component.
+For **build mode** (default) you only need steps 1 and 3. **Client mode** also
+needs step 2 (register the component).
 
 **1. Add the remark plugin** in `docusaurus.config.ts`:
 
@@ -41,7 +43,7 @@ export default {
 };
 ```
 
-**2. Register the `DotDiagram` component** by swizzling `src/theme/MDXComponents`:
+**2. (Client mode only) Register the `DotDiagram` component** by swizzling `src/theme/MDXComponents`:
 
 ```tsx
 // src/theme/MDXComponents.tsx
@@ -71,9 +73,9 @@ digraph {
 ## Options
 
 Same `DotPluginOptions` as [`@knowvah/dot-core`](../core): `renderLanguage`,
-`defaultEngine`, `wrapperClass`, `useCurrentColor`. Per-block via the code meta:
-`` ```dot engine=neato `` and `` ```dot no-render ``. (`timeout` / `onError`
-apply to build-mode rendering and are unused in this client-mode adapter.)
+`mode` (`build` | `client`), `defaultEngine`, `wrapperClass`, `useCurrentColor`,
+and `timeout` / `onError` (build mode). Per-block via the code meta:
+`` ```dot engine=neato ``, `` ```dot no-render ``, `` ```dot client ``.
 
 ## License
 

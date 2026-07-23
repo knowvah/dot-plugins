@@ -20,6 +20,8 @@ export {
 
 export {
   renderDotHtml,
+  renderDotSvg,
   resolveConfig,
   type ResolvedConfig,
+  type DotSvgResult,
 } from './render.js';

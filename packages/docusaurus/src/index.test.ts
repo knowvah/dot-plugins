@@ -1,12 +1,18 @@
 import { describe, it, expect } from 'vitest';
+import { compile } from '@mdx-js/mdx';
 import remarkDot from './index.js';
 import DotDiagram from './client.js';
 import type { Root, Code } from 'mdast';
 
+interface Attr {
+  name: string;
+  value: unknown;
+}
 interface JsxNode {
   type: string;
   name?: string;
-  attributes?: { name: string; value: string | null }[];
+  attributes?: Attr[];
+  children?: { value?: string }[];
 }
 
 function codeNode(lang: string, value: string, meta?: string): Code {
@@ -17,35 +23,59 @@ function transform(code: Code, options = {}): JsxNode {
   remarkDot(options)(tree);
   return tree.children[0] as unknown as JsxNode;
 }
-function attrOf(node: JsxNode, name: string) {
+function attrOf(node: JsxNode, name: string): Attr | undefined {
   return node.attributes?.find((a) => a.name === name);
 }
 
-describe('remarkDot', () => {
-  it('replaces a dot code block with a <DotDiagram> JSX element', () => {
+describe('remarkDot — build mode (default)', () => {
+  it('renders a dot block to a static <div> with dangerouslySetInnerHTML', () => {
     const node = transform(codeNode('dot', 'digraph { a -> b }'));
     expect(node.type).toBe('mdxJsxFlowElement');
-    expect(node.name).toBe('DotDiagram');
-    expect(decodeURIComponent(attrOf(node, 'graph')!.value!)).toBe(
-      'digraph { a -> b }',
-    );
-    expect(attrOf(node, 'engine')!.value).toBe('dot');
+    expect(node.name).toBe('div');
+    expect(attrOf(node, 'className')!.value).toBe('dot-diagram');
+    const dih = attrOf(node, 'dangerouslySetInnerHTML')!
+      .value as { value: string };
+    expect(dih.value).toContain('<svg');
   });
 
-  it('reads a per-block engine from the code meta', () => {
-    const node = transform(codeNode('dot', 'graph{a--b}', 'engine=neato'));
+  it('renders an error <div> for invalid DOT', () => {
+    const node = transform(codeNode('dot', 'nope {{{'));
+    expect(node.name).toBe('div');
+    expect(attrOf(node, 'className')!.value).toBe('dot-diagram-error');
+    expect(node.children?.[0]?.value).toBeTruthy();
+  });
+
+  it('compiles cleanly through the real MDX pipeline', async () => {
+    const out = String(
+      await compile('```dot\ndigraph { a -> b }\n```\n', {
+        remarkPlugins: [remarkDot],
+      }),
+    );
+    expect(out).toContain('dangerouslySetInnerHTML');
+    expect(out).toContain('<svg');
+  });
+});
+
+describe('remarkDot — client mode', () => {
+  it('emits <DotDiagram> for a client block', () => {
+    const node = transform(codeNode('dot', 'digraph{a->b}', 'client'));
+    expect(node.type).toBe('mdxJsxFlowElement');
+    expect(node.name).toBe('DotDiagram');
+    expect(decodeURIComponent(attrOf(node, 'graph')!.value as string)).toBe(
+      'digraph{a->b}',
+    );
+  });
+
+  it('honors a global client mode + per-block engine', () => {
+    const node = transform(codeNode('dot', 'graph{a--b}', 'engine=neato'), {
+      mode: 'client',
+    });
+    expect(node.name).toBe('DotDiagram');
     expect(attrOf(node, 'engine')!.value).toBe('neato');
   });
+});
 
-  it('adds useCurrentColor as a boolean attribute when set', () => {
-    const node = transform(codeNode('dot', 'digraph{a->b}'), {
-      useCurrentColor: true,
-    });
-    const uc = attrOf(node, 'useCurrentColor');
-    expect(uc).toBeTruthy();
-    expect(uc!.value).toBeNull();
-  });
-
+describe('remarkDot — delegation', () => {
   it('leaves no-render and non-dot blocks as code', () => {
     expect(transform(codeNode('dot', 'digraph{a->b}', 'no-render')).type).toBe(
       'code',
@@ -62,13 +92,13 @@ describe('remarkDot', () => {
     expect(
       transform(codeNode('graphviz', 'digraph{a->b}'), {
         renderLanguage: 'graphviz',
-      }).type,
-    ).toBe('mdxJsxFlowElement');
+      }).name,
+    ).toBe('div');
   });
 });
 
 describe('DotDiagram component', () => {
-  it('is a React component (renders via core/browser renderDiagram)', () => {
+  it('is a React component', () => {
     expect(typeof DotDiagram).toBe('function');
   });
 });
