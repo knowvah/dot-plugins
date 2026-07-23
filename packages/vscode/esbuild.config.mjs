@@ -8,8 +8,12 @@ const watch = process.argv.includes('--watch');
 
 /** @type {import('esbuild').BuildOptions} */
 const options = {
-  entryPoints: ['src/extension.ts'],
-  outfile: 'dist/extension.js',
+  // extension.ts → the host; render-worker.ts → the terminable render thread.
+  entryPoints: {
+    extension: 'src/extension.ts',
+    'render-worker': 'src/render-worker.ts',
+  },
+  outdir: 'dist',
   bundle: true,
   format: 'cjs',
   platform: 'node',

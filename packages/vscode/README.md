@@ -60,25 +60,32 @@ pnpm --filter dot-vscode test         # vitest — preview render unit tests
 pnpm --filter dot-vscode package      # vsce → dot-vscode-<version>.vsix
 ```
 
-`build` bundles the extension host with esbuild, inlining `@knowvah/dot-core`
-and `graphviz-ts` into a single CJS file, so the packaged `.vsix` ships with no
-`node_modules`. To debug, open this folder in VS Code and press **F5** (Run
-Extension) after a `build`.
+`build` bundles the extension host (`dist/extension.js`) and the render worker
+(`dist/render-worker.js`) with esbuild, inlining `@knowvah/dot-core` and
+`graphviz-ts`, so the packaged `.vsix` ships with no `node_modules`. To debug,
+open this folder in VS Code and press **F5** (Run Extension) after a `build`.
 
 ## Architecture
 
-The render logic is a pure, `vscode`-free module (`src/preview.ts`): DOT string
-→ complete webview HTML (inline SVG or an error panel), which makes it unit
-testable in isolation. `src/extension.ts` is the thin imperative shell — it owns
-the command, the webview panel, and document-change syncing. Grammar and
-language association are declarative (`package.json` `contributes`).
+Pure, `vscode`-free modules keep the logic unit-testable: `src/preview.ts`
+(engine directive + webview HTML wrapping) and `src/render-service.ts` (the
+terminable worker pool). `src/render-worker.ts` is the worker-thread entry that
+actually renders. `src/extension.ts` is the thin imperative shell — command,
+webview panel, debounced document-change syncing. Grammar and language
+association are declarative (`package.json` `contributes`).
+
+The file preview renders in a **worker thread** with a 5s timeout: a
+non-terminating graph is killed via `worker.terminate()` and reported as a
+timeout, so it can't freeze the extension host. Edits are debounced (200 ms) and
+stale renders are dropped (latest edit wins).
 
 ## Known limitations (v1)
 
-- **Synchronous, in-process render.** A pathological non-terminating graph could
-  hang the extension host until the window is reloaded. graphviz-ts's own
-  documented infinite-loop cases are rare; a future version can move rendering
-  to a terminable worker with a timeout.
+- **Markdown preview renders synchronously.** markdown-it fence rules can't be
+  async, so ` ```dot ` blocks in the Markdown preview render in-process on the
+  extension host — a pathological non-terminating graph there could hang the
+  preview (the standalone file preview is unaffected; it uses the worker above).
+  graphviz-ts's documented infinite-loop cases are rare.
 - **HTML labels in the Markdown preview.** VS Code's built-in Markdown preview
   sanitizes rendered HTML (DOMPurify). Standard SVG shapes and text render, but
   `<foreignObject>` — which Graphviz emits for HTML-like labels

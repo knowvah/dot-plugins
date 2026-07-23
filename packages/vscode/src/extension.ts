@@ -2,36 +2,54 @@
 /**
  * VS Code extension host: a `.dot` / `.gv` live preview. The `dot.showPreview`
  * command renders the active DOT document to inline SVG in a webview beside the
- * editor and keeps it in sync as the document changes. Syntax highlighting is
- * contributed declaratively (the `grammars` contribution in package.json); this
- * file only adds the preview.
+ * editor and keeps it in sync as the document changes. Rendering runs in a
+ * terminable worker (see `render-service.ts`) so a non-terminating graph is
+ * killed on timeout rather than freezing the host. Syntax highlighting and the
+ * Markdown-preview plugin are contributed separately.
  */
 import * as path from 'node:path';
 import type MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
-import { renderPreviewHtml, resolveEngine } from './preview.js';
+import { previewDocument, resolveEngine } from './preview.js';
+import { DotRenderService } from './render-service.js';
 import { extendMarkdownIt } from './markdown.js';
 
 const VIEW_TYPE = 'dot.preview';
-
-function previewTitle(doc: vscode.TextDocument, engine: string): string {
-  const base = path.basename(doc.uri.fsPath);
-  return engine === 'dot' ? `Preview ${base}` : `Preview ${base} (${engine})`;
-}
+const RENDER_TIMEOUT_MS = 5000;
+const DEBOUNCE_MS = 200;
 
 /** The API VS Code reads from `activate()` to extend the Markdown preview. */
 export interface DotExtensionApi {
   extendMarkdownIt(md: MarkdownIt): MarkdownIt;
 }
 
-export function activate(context: vscode.ExtensionContext): DotExtensionApi {
-  // One reusable preview panel per source document, keyed by URI.
-  const panels = new Map<string, vscode.WebviewPanel>();
+function previewTitle(doc: vscode.TextDocument, engine: string): string {
+  const base = path.basename(doc.uri.fsPath);
+  return engine === 'dot' ? `Preview ${base}` : `Preview ${base} (${engine})`;
+}
 
-  const update = (panel: vscode.WebviewPanel, doc: vscode.TextDocument): void => {
+export function activate(context: vscode.ExtensionContext): DotExtensionApi {
+  const workerPath = vscode.Uri.joinPath(
+    context.extensionUri,
+    'dist',
+    'render-worker.js',
+  ).fsPath;
+  const renderer = new DotRenderService(workerPath, RENDER_TIMEOUT_MS);
+
+  const panels = new Map<string, vscode.WebviewPanel>();
+  const debounces = new Map<string, ReturnType<typeof setTimeout>>();
+
+  const update = async (
+    panel: vscode.WebviewPanel,
+    doc: vscode.TextDocument,
+  ): Promise<void> => {
     const text = doc.getText();
-    panel.webview.html = renderPreviewHtml(text, panel.webview.cspSource);
-    panel.title = previewTitle(doc, resolveEngine(text)); // reflects the directive live
+    const version = doc.version;
+    panel.title = previewTitle(doc, resolveEngine(text)); // immediate feedback
+    const result = await renderer.render({ dot: text, engine: resolveEngine(text) });
+    // Drop a stale render: the panel closed, or a newer edit superseded this one.
+    if (panels.get(doc.uri.toString()) !== panel || doc.version !== version) return;
+    panel.webview.html = previewDocument(result, panel.webview.cspSource);
   };
 
   const openPreview = (doc: vscode.TextDocument): void => {
@@ -40,14 +58,14 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
     if (panel === undefined) {
       panel = vscode.window.createWebviewPanel(
         VIEW_TYPE,
-        `Preview ${path.basename(doc.uri.fsPath)}`,
+        previewTitle(doc, resolveEngine(doc.getText())),
         { viewColumn: vscode.ViewColumn.Beside, preserveFocus: true },
         { enableScripts: false, retainContextWhenHidden: true },
       );
       panel.onDidDispose(() => panels.delete(key));
       panels.set(key, panel);
     }
-    update(panel, doc);
+    void update(panel, doc);
     panel.reveal(vscode.ViewColumn.Beside, true);
   };
 
@@ -57,9 +75,16 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
       if (doc !== undefined && doc.languageId === 'dot') openPreview(doc);
     }),
     vscode.workspace.onDidChangeTextDocument((e) => {
-      const panel = panels.get(e.document.uri.toString());
-      if (panel !== undefined) update(panel, e.document);
+      const key = e.document.uri.toString();
+      const panel = panels.get(key);
+      if (panel === undefined) return;
+      clearTimeout(debounces.get(key));
+      debounces.set(
+        key,
+        setTimeout(() => void update(panel, e.document), DEBOUNCE_MS),
+      );
     }),
+    { dispose: () => renderer.disposeAll() },
   );
 
   // Contribute the DOT fence renderer to VS Code's built-in Markdown preview.
@@ -67,5 +92,5 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
 }
 
 export function deactivate(): void {
-  // Preview panels are disposed via context.subscriptions / onDidDispose.
+  // Preview panels and the render service are disposed via context.subscriptions.
 }

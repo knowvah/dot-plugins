@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { renderPreviewHtml, resolveEngine } from './preview.js';
+import { previewDocument, resolveEngine } from './preview.js';
 
 const CSP = 'vscode-webview://xyz';
 
@@ -29,30 +29,22 @@ describe('resolveEngine', () => {
   });
 });
 
-describe('renderPreviewHtml', () => {
-  it('renders valid DOT to an inline <svg> document', () => {
-    const html = renderPreviewHtml('digraph { a -> b }', CSP);
+describe('previewDocument', () => {
+  it('wraps inline SVG in a themed HTML document with a scoped CSP', () => {
+    const html = previewDocument({ svg: '<svg id="g"></svg>' }, CSP);
     expect(html).toContain('<!DOCTYPE html>');
-    expect(html).toContain('<svg');
+    expect(html).toContain('<svg id="g">');
+    expect(html).toContain("default-src 'none'");
+    expect(html).toContain(`style-src ${CSP}`);
+    expect(html).toContain('--vscode-editor-foreground');
     expect(html).not.toContain('class="error"');
   });
 
-  it('embeds a Content-Security-Policy scoped to the webview source', () => {
-    const html = renderPreviewHtml('digraph { a -> b }', CSP);
-    expect(html).toContain('Content-Security-Policy');
-    expect(html).toContain("default-src 'none'");
-    expect(html).toContain(`style-src ${CSP}`);
-  });
-
-  it('renders an error panel (not <svg>) for invalid DOT', () => {
-    const html = renderPreviewHtml('nope {{{', CSP);
+  it('renders an escaped error panel when there is no SVG', () => {
+    const html = previewDocument({ error: 'boom <x> & fail' }, CSP);
     expect(html).toContain('class="error"');
     expect(html).toContain('role="alert"');
+    expect(html).toContain('boom &lt;x&gt; &amp; fail');
     expect(html).not.toContain('<svg');
-  });
-
-  it('uses theme CSS variables so the diagram is theme-aware', () => {
-    const html = renderPreviewHtml('digraph { a -> b }', CSP);
-    expect(html).toContain('--vscode-editor-foreground');
   });
 });

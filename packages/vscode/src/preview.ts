@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: MIT
 /**
- * Pure preview rendering: a DOT string → a complete, theme-aware webview HTML
- * document (inline SVG on success, a readable error panel on failure). No
- * `vscode` dependency, so it is unit-testable in isolation — `extension.ts`
- * supplies the webview's `cspSource` and hosts the result.
+ * Pure preview helpers — engine selection and webview HTML wrapping. No
+ * `vscode` dependency and no rendering (that runs in a terminable worker; see
+ * `render-service.ts`), so this stays trivially unit-testable.
  */
-import {
-  renderDotSvg,
-  resolveConfig,
-  escapeHtml,
-  type ResolvedConfig,
-} from '@knowvah/dot-core';
-import type { BuiltinEngine, GvError } from 'graphviz-ts';
+import { escapeHtml } from '@knowvah/dot-core';
+import type { BuiltinEngine } from 'graphviz-ts';
 
-// `useCurrentColor` remaps graphviz's black strokes/text to `currentColor`, so
-// the diagram inherits the editor foreground in any theme (light or dark).
-const CONFIG: ResolvedConfig = resolveConfig({ useCurrentColor: true });
+/** A rendered preview: either inline SVG, or a human-readable error message. */
+export interface PreviewResult {
+  svg?: string;
+  error?: string;
+}
 
 // The built-in layout engines (graphviz-ts throws on any other name, so a stray
 // comment match must be validated against this set before it is used).
@@ -57,22 +53,15 @@ export function resolveEngine(dot: string): BuiltinEngine {
   return 'dot';
 }
 
-/**
- * Render DOT to a full webview HTML document.
- * @param dot - the document's DOT source
- * @param cspSource - the webview's `webview.cspSource` (its allowed asset origin)
- */
-export function renderPreviewHtml(dot: string, cspSource: string): string {
-  const { svg, error } = renderDotSvg(dot, resolveEngine(dot), CONFIG);
-  return htmlDocument(svg ?? errorMarkup(error), cspSource);
+/** Wrap a render result in a complete, theme-aware webview HTML document.
+ * `cspSource` is the webview's `webview.cspSource` (its allowed asset origin). */
+export function previewDocument(result: PreviewResult, cspSource: string): string {
+  return htmlDocument(result.svg ?? errorMarkup(result.error), cspSource);
 }
 
-function errorMarkup(error: GvError | undefined): string {
-  const message = escapeHtml(error?.friendlyMessage ?? 'Failed to render graph.');
-  const at = error?.location
-    ? ` <span class="loc">(line ${error.location.line}, column ${error.location.column})</span>`
-    : '';
-  return `<div class="error" role="alert">${message}${at}</div>`;
+function errorMarkup(error: string | undefined): string {
+  const message = escapeHtml(error ?? 'Failed to render graph.');
+  return `<div class="error" role="alert">${message}</div>`;
 }
 
 function htmlDocument(body: string, cspSource: string): string {
@@ -103,5 +92,4 @@ const STYLE = `
     background: var(--vscode-inputValidation-errorBackground, rgba(229,83,75,.1));
     color: var(--vscode-errorForeground, #e5534b);
     font-family: var(--vscode-editor-font-family, monospace); }
-  .error .loc { opacity: .8; }
 `;
