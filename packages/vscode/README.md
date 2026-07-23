@@ -30,23 +30,30 @@ Open a `.dot` or `.gv` file and either:
 - run **DOT: Open Preview to the Side** from the Command Palette, or
 - press `Ctrl+K V` (`Cmd+K V` on macOS).
 
-### Choosing a layout engine per file
+### Choosing a layout engine
 
-Add a directive to a **leading line comment** (before the graph), using either
-DOT line-comment style:
+There are three ways to set the engine, in **precedence order** (highest first):
 
-```dot
-// engine: neato
-digraph {
-  a -> b;
-}
-```
+1. **A remembered per-file selection.** Run **DOT: Select Layout Engine** (title
+   bar, Command Palette) and pick from `dot`, `neato`, `fdp`, `sfdp`, `circo`,
+   `twopi`, `osage`, `patchwork`. A non-default pick is remembered for that file
+   (in workspace state) and reused whenever you preview it. Picking the engine
+   the file would use anyway clears the remembered selection.
+2. **An in-file directive** in a leading line comment (before the graph):
 
-`# engine = fdp` works too; the match is case-insensitive. Recognized engines:
-`dot` (default), `neato`, `fdp`, `sfdp`, `circo`, `twopi`, `osage`, `patchwork`.
-An unrecognized or absent directive falls back to `dot`. The directive must
-appear before the graph body — comments after it are ignored — and the preview
-panel title shows the engine in use (e.g. `Preview graph.dot (neato)`).
+   ```dot
+   // engine: neato
+   digraph { a -> b; }
+   ```
+
+   `# engine = fdp` works too; the match is case-insensitive and must appear
+   before the graph body (later comments are ignored).
+3. **The `dot.preview.defaultEngine` setting** — used when a file has neither a
+   remembered selection nor a directive.
+
+The preview panel title shows the engine in use (e.g. `Preview graph.dot
+(neato)`). `dot.preview.defaultEngine` also sets the default for ` ```dot `
+blocks in the Markdown preview (a per-block ` engine=… ` still overrides it).
 
 ## Building from source
 
@@ -81,6 +88,9 @@ dropped (latest edit wins).
 
 ## Settings
 
+- **`dot.preview.defaultEngine`** (default `dot`) — the layout engine used when
+  a file has no remembered selection and no `// engine:` directive; also the
+  default for Markdown-preview ` ```dot ` blocks. See *Choosing a layout engine*.
 - **`dot.preview.renderTimeoutSeconds`** (default `60`, min `1`) — how long the
   file preview waits for a render before aborting to a timeout message. Because
   rendering is off the main thread, this never freezes the editor; raise it for

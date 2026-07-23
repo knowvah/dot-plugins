@@ -13,9 +13,9 @@ export interface PreviewResult {
   error?: string;
 }
 
-// The built-in layout engines (graphviz-ts throws on any other name, so a stray
-// comment match must be validated against this set before it is used).
-const BUILTIN_ENGINES: readonly BuiltinEngine[] = [
+/** The built-in layout engines (graphviz-ts throws on any other name, so a name
+ * from a comment or setting must be validated against this set before use). */
+export const BUILTIN_ENGINES: readonly BuiltinEngine[] = [
   'dot',
   'neato',
   'fdp',
@@ -35,11 +35,12 @@ function isLineComment(line: string): boolean {
 }
 
 /**
- * Pick the layout engine for a document from an optional directive in its
- * leading line comments (`// engine: neato`). Scanning stops at the first line
- * of graph content, so only a header comment counts. Unknown or absent → `dot`.
+ * Parse an engine directive from a document's leading line comments
+ * (`// engine: neato`). Scanning stops at the first line of graph content, so
+ * only a header comment counts. Returns the engine, or `undefined` if there is
+ * no (recognized) directive.
  */
-export function resolveEngine(dot: string): BuiltinEngine {
+export function parseEngineDirective(dot: string): BuiltinEngine | undefined {
   for (const raw of dot.split('\n')) {
     const line = raw.trim();
     if (line === '') continue;
@@ -50,7 +51,22 @@ export function resolveEngine(dot: string): BuiltinEngine {
       if (BUILTIN_ENGINES.includes(name)) return name;
     }
   }
-  return 'dot';
+  return undefined;
+}
+
+/** The ordered engine sources for a document; the first present one wins. */
+export interface EngineSources {
+  /** A remembered per-file user selection (highest precedence). */
+  override?: BuiltinEngine;
+  /** An in-file `// engine:` directive. */
+  directive?: BuiltinEngine;
+  /** The configured default engine (used when nothing else applies). */
+  fallback: BuiltinEngine;
+}
+
+/** Layered resolution: remembered override → in-file directive → default. */
+export function resolveEngine(sources: EngineSources): BuiltinEngine {
+  return sources.override ?? sources.directive ?? sources.fallback;
 }
 
 /** Wrap a render result in a complete, theme-aware webview HTML document.

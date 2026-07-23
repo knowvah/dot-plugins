@@ -32,6 +32,21 @@
     "configuration": {
       "title": "DOT (Graphviz)",
       "properties": {
+        "dot.preview.defaultEngine": {
+          "type": "string",
+          "enum": [
+            "dot",
+            "neato",
+            "fdp",
+            "sfdp",
+            "circo",
+            "twopi",
+            "osage",
+            "patchwork"
+          ],
+          "default": "dot",
+          "markdownDescription": "Default layout engine for previews when a file has no `// engine: …` directive and no remembered per-file selection. A remembered selection (DOT: Select Layout Engine) and an in-file directive both override this."
+        },
         "dot.preview.renderTimeoutSeconds": {
           "type": "number",
           "default": 60,
@@ -72,6 +87,12 @@
         "title": "Open Preview to the Side",
         "category": "DOT",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "dot.selectEngine",
+        "title": "Select Layout Engine",
+        "category": "DOT",
+        "icon": "$(list-selection)"
       }
     ],
     "menus": {
@@ -80,11 +101,19 @@
           "when": "resourceLangId == dot",
           "command": "dot.showPreview",
           "group": "navigation"
+        },
+        {
+          "when": "resourceLangId == dot",
+          "command": "dot.selectEngine"
         }
       ],
       "commandPalette": [
         {
           "command": "dot.showPreview",
+          "when": "resourceLangId == dot"
+        },
+        {
+          "command": "dot.selectEngine",
           "when": "resourceLangId == dot"
         }
       ]

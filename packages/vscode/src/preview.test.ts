@@ -1,31 +1,53 @@
 import { describe, it, expect } from 'vitest';
-import { previewDocument, resolveEngine } from './preview.js';
+import {
+  previewDocument,
+  parseEngineDirective,
+  resolveEngine,
+} from './preview.js';
 
 const CSP = 'vscode-webview://xyz';
 
-describe('resolveEngine', () => {
-  it('defaults to dot when there is no directive', () => {
-    expect(resolveEngine('digraph { a -> b }')).toBe('dot');
+describe('parseEngineDirective', () => {
+  it('returns undefined when there is no directive', () => {
+    expect(parseEngineDirective('digraph { a -> b }')).toBeUndefined();
   });
 
   it('reads a `// engine: <name>` line comment', () => {
-    expect(resolveEngine('// engine: neato\ngraph { a -- b }')).toBe('neato');
+    expect(parseEngineDirective('// engine: neato\ngraph { a -- b }')).toBe(
+      'neato',
+    );
   });
 
-  it('reads a `# engine = <name>` line comment (and is case-insensitive)', () => {
-    expect(resolveEngine('#  ENGINE = FDP\ngraph { a -- b }')).toBe('fdp');
+  it('reads a `# engine = <name>` line comment (case-insensitive)', () => {
+    expect(parseEngineDirective('#  ENGINE = FDP\ngraph { a -- b }')).toBe('fdp');
   });
 
   it('scans past blank/comment lines but stops at graph content', () => {
-    expect(resolveEngine('\n// header\n// engine: circo\ndigraph {}')).toBe(
+    expect(parseEngineDirective('\n// header\n// engine: circo\ndigraph {}')).toBe(
       'circo',
     );
     // a directive after the graph body is ignored
-    expect(resolveEngine('digraph {}\n// engine: neato')).toBe('dot');
+    expect(parseEngineDirective('digraph {}\n// engine: neato')).toBeUndefined();
   });
 
-  it('ignores an unknown engine name (falls back to dot)', () => {
-    expect(resolveEngine('// engine: bogus\ndigraph {}')).toBe('dot');
+  it('ignores an unknown engine name', () => {
+    expect(parseEngineDirective('// engine: bogus\ndigraph {}')).toBeUndefined();
+  });
+});
+
+describe('resolveEngine (layered precedence)', () => {
+  it('prefers a remembered override over everything', () => {
+    expect(
+      resolveEngine({ override: 'fdp', directive: 'neato', fallback: 'dot' }),
+    ).toBe('fdp');
+  });
+
+  it('uses the in-file directive when there is no override', () => {
+    expect(resolveEngine({ directive: 'neato', fallback: 'circo' })).toBe('neato');
+  });
+
+  it('falls back to the configured default when nothing else applies', () => {
+    expect(resolveEngine({ fallback: 'twopi' })).toBe('twopi');
   });
 });
 

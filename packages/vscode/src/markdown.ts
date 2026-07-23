@@ -18,10 +18,12 @@ import { renderDotHtml } from '@knowvah/dot-core';
 const renderInline: ClientEmitter = (dot, engine, cfg) =>
   renderDotHtml(dot, engine, cfg);
 
-/** VS Code's `extendMarkdownIt` contribution: install the DOT fence renderer. */
-export function extendMarkdownIt(md: MarkdownIt): MarkdownIt {
+/** VS Code's `extendMarkdownIt` contribution: install the DOT fence renderer.
+ * `defaultEngine` is the engine for blocks without an ` engine=… ` directive. */
+export function extendMarkdownIt(md: MarkdownIt, defaultEngine = 'dot'): MarkdownIt {
   return md.use(dotMarkdown, {
     useCurrentColor: true,
+    defaultEngine,
     emitClient: renderInline,
   });
 }
