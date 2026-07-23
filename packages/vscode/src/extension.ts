@@ -15,8 +15,8 @@ import { DotRenderService } from './render-service.js';
 import { extendMarkdownIt } from './markdown.js';
 
 const VIEW_TYPE = 'dot.preview';
-const RENDER_TIMEOUT_MS = 5000;
 const DEBOUNCE_MS = 200;
+const DEFAULT_TIMEOUT_SECONDS = 60;
 
 /** The API VS Code reads from `activate()` to extend the Markdown preview. */
 export interface DotExtensionApi {
@@ -28,13 +28,22 @@ function previewTitle(doc: vscode.TextDocument, engine: string): string {
   return engine === 'dot' ? `Preview ${base}` : `Preview ${base} (${engine})`;
 }
 
+/** The file-preview render timeout in ms, from settings (read per render, so a
+ * live change applies without a reload). */
+function renderTimeoutMs(): number {
+  const seconds = vscode.workspace
+    .getConfiguration('dot')
+    .get<number>('preview.renderTimeoutSeconds', DEFAULT_TIMEOUT_SECONDS);
+  return Math.max(1, seconds) * 1000;
+}
+
 export function activate(context: vscode.ExtensionContext): DotExtensionApi {
   const workerPath = vscode.Uri.joinPath(
     context.extensionUri,
     'dist',
     'render-worker.js',
   ).fsPath;
-  const renderer = new DotRenderService(workerPath, RENDER_TIMEOUT_MS);
+  const renderer = new DotRenderService(workerPath, renderTimeoutMs);
 
   const panels = new Map<string, vscode.WebviewPanel>();
   const debounces = new Map<string, ReturnType<typeof setTimeout>>();

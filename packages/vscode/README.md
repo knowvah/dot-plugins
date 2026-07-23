@@ -74,10 +74,18 @@ actually renders. `src/extension.ts` is the thin imperative shell — command,
 webview panel, debounced document-change syncing. Grammar and language
 association are declarative (`package.json` `contributes`).
 
-The file preview renders in a **worker thread** with a 5s timeout: a
-non-terminating graph is killed via `worker.terminate()` and reported as a
-timeout, so it can't freeze the extension host. Edits are debounced (200 ms) and
-stale renders are dropped (latest edit wins).
+The file preview renders in a **worker thread** with a timeout: a non-terminating
+graph is killed via `worker.terminate()` and reported as a timeout, so it can't
+freeze the extension host. Edits are debounced (200 ms) and stale renders are
+dropped (latest edit wins).
+
+## Settings
+
+- **`dot.preview.renderTimeoutSeconds`** (default `60`, min `1`) — how long the
+  file preview waits for a render before aborting to a timeout message. Because
+  rendering is off the main thread, this never freezes the editor; raise it for
+  very large graphs, lower it if you want a runaway graph reported sooner. The
+  value is read per render, so changes take effect immediately (no reload).
 
 ## Known limitations (v1)
 

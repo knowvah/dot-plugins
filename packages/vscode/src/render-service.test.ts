@@ -28,4 +28,12 @@ describe('DotRenderService', () => {
     expect(result.svg).toBeUndefined();
     expect(result.error).toMatch(/timed out/i);
   });
+
+  it('reads a getter timeout per render (live-configurable)', async () => {
+    let ms = 5000;
+    svc = new DotRenderService(WORKER, () => ms);
+    ms = 100; // change before rendering — the getter must pick this up
+    const result = await svc.render({ dot: 'HANG', engine: 'dot' });
+    expect(result.error).toContain('100 ms');
+  });
 });

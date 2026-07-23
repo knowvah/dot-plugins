@@ -29,6 +29,17 @@
   },
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "DOT (Graphviz)",
+      "properties": {
+        "dot.preview.renderTimeoutSeconds": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "markdownDescription": "Maximum time (in seconds) to render a `.dot`/`.gv` file preview before treating the graph as non-terminating and aborting to a timeout message. Rendering runs in a worker thread, so this never freezes the editor — raise it for very large graphs."
+        }
+      }
+    },
     "markdown.markdownItPlugins": true,
     "markdown.previewStyles": [
       "./media/dot-preview.css"

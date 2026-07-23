@@ -23,16 +23,22 @@ interface WorkerResult {
 export class DotRenderService {
   private readonly active = new Set<Worker>();
 
+  /**
+   * @param workerPath - the bundled render worker (`dist/render-worker.js`).
+   * @param timeout - the per-render timeout in ms, or a getter read at each
+   *   render so a live configuration change takes effect without a reload.
+   */
   constructor(
     private readonly workerPath: string | URL,
-    private readonly timeoutMs = 5000,
+    private readonly timeout: number | (() => number) = 5000,
   ) {}
 
   /** Render a request, resolving with inline SVG or an error message. Never
-   * rejects and never hangs longer than `timeoutMs`. */
+   * rejects and never hangs longer than the configured timeout. */
   render(req: RenderRequest): Promise<PreviewResult> {
     const worker = new Worker(this.workerPath);
     this.active.add(worker);
+    const timeoutMs = this.timeoutMs();
     return new Promise<PreviewResult>((resolve) => {
       let settled = false;
       const finish = (result: PreviewResult): void => {
@@ -43,13 +49,17 @@ export class DotRenderService {
         resolve(result);
       };
       const timer = setTimeout(
-        () => finish({ error: `Render timed out after ${this.timeoutMs} ms.` }),
-        this.timeoutMs,
+        () => finish({ error: `Render timed out after ${timeoutMs} ms.` }),
+        timeoutMs,
       );
       worker.once('message', (r: WorkerResult) => finish(toPreview(r)));
       worker.once('error', (e: Error) => finish({ error: e.message }));
       worker.postMessage(req);
     });
+  }
+
+  private timeoutMs(): number {
+    return typeof this.timeout === 'function' ? this.timeout() : this.timeout;
   }
 
   /** Terminate any in-flight workers (call on extension deactivate). */
