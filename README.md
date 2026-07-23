@@ -13,7 +13,7 @@ each generator gets a thin adapter package.
 | [`@knowvah/dot-core`](packages/core) | — (shared engine) | ✅ render + parse + browser |
 | [`@knowvah/vitepress-plugin-dot`](packages/vitepress) | VitePress (markdown-it) | ✅ build-time SSR + client mode |
 | [`@knowvah/eleventy-plugin-dot`](packages/eleventy) | Eleventy (markdown-it) | ✅ build mode |
-| `@knowvah/docusaurus-plugin-dot` | Docusaurus (MDX/remark) | planned |
+| [`@knowvah/docusaurus-plugin-dot`](packages/docusaurus) | Docusaurus (MDX/remark) | ✅ client mode |
 
 ## Develop
 

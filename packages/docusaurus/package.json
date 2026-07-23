@@ -1,0 +1,70 @@
+{
+  "name": "@knowvah/docusaurus-plugin-dot",
+  "version": "0.1.0",
+  "description": "Render Graphviz DOT fenced code blocks as diagrams in Docusaurus (MDX) — powered by the pure-TypeScript graphviz-ts engine.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "docusaurus",
+    "remark",
+    "mdx",
+    "graphviz",
+    "dot",
+    "svg",
+    "graphviz-ts"
+  ],
+  "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/docusaurus#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knowvah/dot-plugins.git",
+    "directory": "packages/docusaurus"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client/index.js",
+      "types": "./dist/client/index.d.ts"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "tsup && cp src/style.css dist/style.css",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@knowvah/dot-core": "workspace:*",
+    "unist-util-visit": "^5.0.0"
+  },
+  "peerDependencies": {
+    "graphviz-ts": ">=0.1.0",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.12.0"
+  }
+}
