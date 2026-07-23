@@ -11,11 +11,51 @@ import {
   escapeHtml,
   type ResolvedConfig,
 } from '@knowvah/dot-core';
-import type { GvError } from 'graphviz-ts';
+import type { BuiltinEngine, GvError } from 'graphviz-ts';
 
 // `useCurrentColor` remaps graphviz's black strokes/text to `currentColor`, so
 // the diagram inherits the editor foreground in any theme (light or dark).
 const CONFIG: ResolvedConfig = resolveConfig({ useCurrentColor: true });
+
+// The built-in layout engines (graphviz-ts throws on any other name, so a stray
+// comment match must be validated against this set before it is used).
+const BUILTIN_ENGINES: readonly BuiltinEngine[] = [
+  'dot',
+  'neato',
+  'fdp',
+  'sfdp',
+  'circo',
+  'twopi',
+  'osage',
+  'patchwork',
+];
+
+// A per-file engine directive in a leading line comment, e.g. `// engine: neato`
+// or `# engine = fdp`.
+const ENGINE_DIRECTIVE = /\bengine\s*[:=]\s*([A-Za-z]+)/i;
+
+function isLineComment(line: string): boolean {
+  return line.startsWith('//') || line.startsWith('#');
+}
+
+/**
+ * Pick the layout engine for a document from an optional directive in its
+ * leading line comments (`// engine: neato`). Scanning stops at the first line
+ * of graph content, so only a header comment counts. Unknown or absent → `dot`.
+ */
+export function resolveEngine(dot: string): BuiltinEngine {
+  for (const raw of dot.split('\n')) {
+    const line = raw.trim();
+    if (line === '') continue;
+    if (!isLineComment(line)) break; // reached the graph body
+    const match = ENGINE_DIRECTIVE.exec(line);
+    if (match !== null) {
+      const name = match[1].toLowerCase() as BuiltinEngine;
+      if (BUILTIN_ENGINES.includes(name)) return name;
+    }
+  }
+  return 'dot';
+}
 
 /**
  * Render DOT to a full webview HTML document.
@@ -23,7 +63,7 @@ const CONFIG: ResolvedConfig = resolveConfig({ useCurrentColor: true });
  * @param cspSource - the webview's `webview.cspSource` (its allowed asset origin)
  */
 export function renderPreviewHtml(dot: string, cspSource: string): string {
-  const { svg, error } = renderDotSvg(dot, 'dot', CONFIG);
+  const { svg, error } = renderDotSvg(dot, resolveEngine(dot), CONFIG);
   return htmlDocument(svg ?? errorMarkup(error), cspSource);
 }
 

@@ -12,6 +12,8 @@ no external Graphviz install, no `dot` binary on your PATH, no network.
   `source.dot`), plus comment/bracket editing behavior.
 - **Live file preview** — `DOT: Open Preview to the Side` renders the active
   file to inline SVG in a webview beside the editor and re-renders as you type.
+  Pick the layout engine per file with a leading line-comment directive, e.g.
+  `// engine: neato` (see below); the panel title shows the active engine.
 - **Markdown preview** — ` ```dot ` fenced code blocks render as inline SVG in
   VS Code's built-in Markdown preview (build-time, no client scripts). Per-block
   directives work: ` ```dot engine=neato `, ` ```dot no-render ` (leave as a
@@ -27,6 +29,24 @@ Open a `.dot` or `.gv` file and either:
 - click the **Open Preview to the Side** button in the editor title bar, or
 - run **DOT: Open Preview to the Side** from the Command Palette, or
 - press `Ctrl+K V` (`Cmd+K V` on macOS).
+
+### Choosing a layout engine per file
+
+Add a directive to a **leading line comment** (before the graph), using either
+DOT line-comment style:
+
+```dot
+// engine: neato
+digraph {
+  a -> b;
+}
+```
+
+`# engine = fdp` works too; the match is case-insensitive. Recognized engines:
+`dot` (default), `neato`, `fdp`, `sfdp`, `circo`, `twopi`, `osage`, `patchwork`.
+An unrecognized or absent directive falls back to `dot`. The directive must
+appear before the graph body — comments after it are ignored — and the preview
+panel title shows the engine in use (e.g. `Preview graph.dot (neato)`).
 
 ## Building from source
 
@@ -59,9 +79,6 @@ language association are declarative (`package.json` `contributes`).
   hang the extension host until the window is reloaded. graphviz-ts's own
   documented infinite-loop cases are rare; a future version can move rendering
   to a terminable worker with a timeout.
-- **No per-file engine selection in the file preview yet** — the standalone
-  `.dot`/`.gv` preview always uses the `dot` engine. (The Markdown preview does
-  honor a per-block ` engine=… ` directive.)
 - **HTML labels in the Markdown preview.** VS Code's built-in Markdown preview
   sanitizes rendered HTML (DOMPurify). Standard SVG shapes and text render, but
   `<foreignObject>` — which Graphviz emits for HTML-like labels

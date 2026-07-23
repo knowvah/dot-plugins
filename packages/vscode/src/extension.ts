@@ -9,10 +9,15 @@
 import * as path from 'node:path';
 import type MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
-import { renderPreviewHtml } from './preview.js';
+import { renderPreviewHtml, resolveEngine } from './preview.js';
 import { extendMarkdownIt } from './markdown.js';
 
 const VIEW_TYPE = 'dot.preview';
+
+function previewTitle(doc: vscode.TextDocument, engine: string): string {
+  const base = path.basename(doc.uri.fsPath);
+  return engine === 'dot' ? `Preview ${base}` : `Preview ${base} (${engine})`;
+}
 
 /** The API VS Code reads from `activate()` to extend the Markdown preview. */
 export interface DotExtensionApi {
@@ -24,7 +29,9 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
   const panels = new Map<string, vscode.WebviewPanel>();
 
   const update = (panel: vscode.WebviewPanel, doc: vscode.TextDocument): void => {
-    panel.webview.html = renderPreviewHtml(doc.getText(), panel.webview.cspSource);
+    const text = doc.getText();
+    panel.webview.html = renderPreviewHtml(text, panel.webview.cspSource);
+    panel.title = previewTitle(doc, resolveEngine(text)); // reflects the directive live
   };
 
   const openPreview = (doc: vscode.TextDocument): void => {

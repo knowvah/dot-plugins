@@ -1,7 +1,33 @@
 import { describe, it, expect } from 'vitest';
-import { renderPreviewHtml } from './preview.js';
+import { renderPreviewHtml, resolveEngine } from './preview.js';
 
 const CSP = 'vscode-webview://xyz';
+
+describe('resolveEngine', () => {
+  it('defaults to dot when there is no directive', () => {
+    expect(resolveEngine('digraph { a -> b }')).toBe('dot');
+  });
+
+  it('reads a `// engine: <name>` line comment', () => {
+    expect(resolveEngine('// engine: neato\ngraph { a -- b }')).toBe('neato');
+  });
+
+  it('reads a `# engine = <name>` line comment (and is case-insensitive)', () => {
+    expect(resolveEngine('#  ENGINE = FDP\ngraph { a -- b }')).toBe('fdp');
+  });
+
+  it('scans past blank/comment lines but stops at graph content', () => {
+    expect(resolveEngine('\n// header\n// engine: circo\ndigraph {}')).toBe(
+      'circo',
+    );
+    // a directive after the graph body is ignored
+    expect(resolveEngine('digraph {}\n// engine: neato')).toBe('dot');
+  });
+
+  it('ignores an unknown engine name (falls back to dot)', () => {
+    expect(resolveEngine('// engine: bogus\ndigraph {}')).toBe('dot');
+  });
+});
 
 describe('renderPreviewHtml', () => {
   it('renders valid DOT to an inline <svg> document', () => {
