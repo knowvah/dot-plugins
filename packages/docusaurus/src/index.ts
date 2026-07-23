@@ -53,8 +53,36 @@ function attr(name: string, value: string | null): MdxJsxAttribute {
   return { type: 'mdxJsxAttribute', name, value };
 }
 
-/** estree Program for the object expression `{ __html: <html> }`. */
-function htmlObjectEstree(html: string): unknown {
+/** Wrap an estree expression node in a Program (what MDX's
+ * `mdxJsxAttributeValueExpression` needs in `data.estree`). */
+function programEstree(expression: unknown): unknown {
+  return {
+    type: 'Program',
+    sourceType: 'module',
+    comments: [],
+    body: [{ type: 'ExpressionStatement', expression }],
+  };
+}
+
+/** A JSX expression attribute `name={<expr>}`. */
+function exprAttr(
+  name: string,
+  source: string,
+  expression: unknown,
+): MdxJsxAttribute {
+  return {
+    type: 'mdxJsxAttribute',
+    name,
+    value: {
+      type: 'mdxJsxAttributeValueExpression',
+      value: source,
+      data: { estree: programEstree(expression) },
+    },
+  };
+}
+
+/** `dangerouslySetInnerHTML={{ __html: "…" }}`. */
+function innerHtmlAttr(html: string): MdxJsxAttribute {
   const property = {
     type: 'Property',
     method: false,
@@ -64,27 +92,15 @@ function htmlObjectEstree(html: string): unknown {
     key: { type: 'Identifier', name: '__html' },
     value: { type: 'Literal', value: html },
   };
-  const expression = { type: 'ObjectExpression', properties: [property] };
-  return {
-    type: 'Program',
-    sourceType: 'module',
-    comments: [],
-    body: [{ type: 'ExpressionStatement', expression }],
-  };
+  return exprAttr('dangerouslySetInnerHTML', `{ __html: ${JSON.stringify(html)} }`, {
+    type: 'ObjectExpression',
+    properties: [property],
+  });
 }
 
-/** Build the `dangerouslySetInnerHTML={{ __html: "…" }}` JSX attribute, incl.
- * the estree the MDX compiler needs. */
-function innerHtmlAttr(html: string): MdxJsxAttribute {
-  return {
-    type: 'mdxJsxAttribute',
-    name: 'dangerouslySetInnerHTML',
-    value: {
-      type: 'mdxJsxAttributeValueExpression',
-      value: `{ __html: ${JSON.stringify(html)} }`,
-      data: { estree: htmlObjectEstree(html) },
-    },
-  };
+/** A string-literal expression attribute `name={"…"}` (safe for any content). */
+function stringExprAttr(name: string, value: string): MdxJsxAttribute {
+  return exprAttr(name, JSON.stringify(value), { type: 'Literal', value });
 }
 
 /** Build mode: render the SVG now and inject it into a static `<div>`. */
@@ -122,7 +138,7 @@ function clientElement(
   cfg: ResolvedConfig,
 ): MdxJsxFlowElement {
   const attributes: MdxJsxAttribute[] = [
-    attr('graph', encodeURIComponent(dot)),
+    stringExprAttr('dot', dot),
     attr('engine', engine),
     attr('wrapperClass', cfg.wrapperClass),
   ];

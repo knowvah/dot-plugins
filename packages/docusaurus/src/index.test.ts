@@ -57,13 +57,13 @@ describe('remarkDot — build mode (default)', () => {
 });
 
 describe('remarkDot — client mode', () => {
-  it('emits <DotDiagram> for a client block', () => {
+  it('emits <DotDiagram dot={…}> (raw source) for a client block', () => {
     const node = transform(codeNode('dot', 'digraph{a->b}', 'client'));
     expect(node.type).toBe('mdxJsxFlowElement');
     expect(node.name).toBe('DotDiagram');
-    expect(decodeURIComponent(attrOf(node, 'graph')!.value as string)).toBe(
-      'digraph{a->b}',
-    );
+    const dot = attrOf(node, 'dot')!.value as { value: string };
+    // The `dot` prop is a JSX expression whose source is the JSON-encoded DOT.
+    expect(JSON.parse(dot.value)).toBe('digraph{a->b}');
   });
 
   it('honors a global client mode + per-block engine', () => {
@@ -72,6 +72,16 @@ describe('remarkDot — client mode', () => {
     });
     expect(node.name).toBe('DotDiagram');
     expect(attrOf(node, 'engine')!.value).toBe('neato');
+  });
+
+  it('compiles a client block through the real MDX pipeline', async () => {
+    const out = String(
+      await compile('```dot client\ndigraph { a -> b }\n```\n', {
+        remarkPlugins: [remarkDot],
+      }),
+    );
+    expect(out).toContain('DotDiagram');
+    expect(out).toContain('digraph');
   });
 });
 
