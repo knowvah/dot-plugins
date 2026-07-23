@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/vitepress:
     devDependencies:
       '@types/markdown-it':
         specifier: ^14.1.2

@@ -1,83 +1,18 @@
 {
-  "name": "@knowvah/vitepress-plugin-dot",
-  "version": "0.1.0",
-  "description": "Render Graphviz DOT fenced code blocks to inline SVG in VitePress — at build time, no client JS, powered by the pure-TypeScript graphviz-ts engine.",
+  "name": "dot-plugins",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
+  "description": "Render Graphviz DOT diagrams in static-site generators (VitePress, Eleventy, Docusaurus) — powered by the pure-TypeScript graphviz-ts engine.",
   "license": "MIT",
-  "keywords": [
-    "vitepress",
-    "vitepress-plugin",
-    "graphviz",
-    "dot",
-    "markdown-it",
-    "diagram",
-    "svg",
-    "graphviz-ts"
-  ],
-  "homepage": "https://github.com/knowvah/vitepress-plugin-dot#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/knowvah/vitepress-plugin-dot.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./markdown-it": {
-      "import": "./dist/markdown-it/index.js",
-      "types": "./dist/markdown-it/index.d.ts"
-    },
-    "./client": {
-      "import": "./dist/client/index.js",
-      "types": "./dist/client/index.d.ts"
-    },
-    "./style.css": "./dist/style.css"
-  },
   "scripts": {
-    "build": "tsup && cp src/style.css dist/style.css",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "demo:build": "vitepress build demo",
-    "demo:dev": "vitepress dev demo"
-  },
-  "peerDependencies": {
-    "graphviz-ts": ">=0.1.0",
-    "vitepress": "^1.0.0",
-    "vue": "^3.4.0"
-  },
-  "peerDependenciesMeta": {
-    "vitepress": {
-      "optional": true
-    },
-    "vue": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "@types/markdown-it": "^14.1.2",
-    "@types/node": "^22.0.0",
-    "graphviz-ts": "^0.1.0",
-    "markdown-it": "^14.1.0",
-    "tsup": "^8.5.0",
-    "typescript": "^6.0.3",
-    "vitepress": "^1.6.4",
-    "vitest": "^3.0.0",
-    "vue": "^3.5.0"
-  },
-  "publishConfig": {
-    "access": "public"
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
-  },
-  "engines": {
-    "node": ">=18.12.0"
   }
 }
