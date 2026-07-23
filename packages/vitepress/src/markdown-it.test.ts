@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import MarkdownIt from 'markdown-it';
-import { dotMarkdown, parseFenceInfo } from './markdown-it.js';
+import { dotMarkdown } from './markdown-it.js';
 
 /** Build a markdown-it with the plugin applied and render a fenced block. */
 function renderFence(
@@ -12,36 +12,6 @@ function renderFence(
   dotMarkdown(md, options);
   return md.render('```' + info + '\n' + body + '\n```\n');
 }
-
-describe('parseFenceInfo', () => {
-  it('extracts the language', () => {
-    expect(parseFenceInfo('dot')).toEqual({ lang: 'dot', noRender: false });
-  });
-  it('reads a space-separated engine (the VitePress-safe form)', () => {
-    expect(parseFenceInfo('dot engine=neato')).toMatchObject({
-      lang: 'dot',
-      engine: 'neato',
-    });
-  });
-  it('reads a quoted engine value', () => {
-    expect(parseFenceInfo('dot engine="circo"')).toMatchObject({
-      lang: 'dot',
-      engine: 'circo',
-    });
-  });
-  it('also tolerates the {brace} form (non-VitePress markdown-it hosts)', () => {
-    expect(parseFenceInfo('dot {engine=neato}')).toMatchObject({
-      lang: 'dot',
-      engine: 'neato',
-    });
-  });
-  it('detects the no-render flag', () => {
-    expect(parseFenceInfo('dot no-render')).toMatchObject({
-      lang: 'dot',
-      noRender: true,
-    });
-  });
-});
 
 describe('dotMarkdown — rendering', () => {
   it('renders a valid DOT block to inline SVG in a wrapper', () => {
@@ -95,7 +65,7 @@ describe('dotMarkdown — errors', () => {
   it('throws when onError is "throw"', () => {
     expect(() =>
       renderFence('dot', 'this is not valid dot {{{', { onError: 'throw' }),
-    ).toThrow(/vitepress-plugin-dot/);
+    ).toThrow(/dot-core/);
   });
 });
 
@@ -133,18 +103,6 @@ describe('dotMarkdown — delegation (does not clobber other fences)', () => {
     // a non-dot fence should reach the sentinel; a dot fence should render
     expect(md.render('```js\nx\n```')).toContain('SENTINEL');
     expect(md.render('```dot\ndigraph{a->b}\n```')).toContain('<svg');
-  });
-});
-
-describe('parseFenceInfo — render mode flags', () => {
-  it('detects client mode', () => {
-    expect(parseFenceInfo('dot client')).toMatchObject({ mode: 'client' });
-  });
-  it('detects build mode', () => {
-    expect(parseFenceInfo('dot build')).toMatchObject({ mode: 'build' });
-  });
-  it('leaves mode undefined when unspecified', () => {
-    expect(parseFenceInfo('dot').mode).toBeUndefined();
   });
 });
 

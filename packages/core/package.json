@@ -1,0 +1,46 @@
+{
+  "name": "@knowvah/dot-core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic Graphviz DOT → SVG render engine for static-site plugins, powered by the pure-TypeScript graphviz-ts engine.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "graphviz",
+    "dot",
+    "svg",
+    "graphviz-ts",
+    "render"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./dist/browser/index.js",
+      "types": "./dist/browser/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "graphviz-ts": ">=0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "graphviz-ts": "^0.1.0",
+    "tsup": "^8.5.0",
+    "typescript": "^6.0.3",
+    "vitest": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

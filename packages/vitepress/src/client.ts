@@ -1,7 +1,7 @@
 /**
  * Client-side render mode: a Vue component that renders a DOT graph to SVG in
- * the browser on mount, using graphviz-ts. Used when a block (or the plugin) is
- * in `mode: 'client'`. Register it once in your VitePress theme:
+ * the browser on mount, via `@knowvah/dot-core/browser`. Used when a block (or
+ * the plugin) is in `mode: 'client'`. Register it once in your VitePress theme:
  *
  * ```ts
  * // docs/.vitepress/theme/index.ts
@@ -17,42 +17,14 @@
  * ```
  */
 import { defineComponent, h, onMounted, ref } from 'vue';
-import type { EngineName } from 'graphviz-ts';
-import { currentColorRemap, toInlineSvg } from './shared.js';
+import { renderDiagram, type DiagramState } from '@knowvah/dot-core/browser';
 
-/** The rendered outcome: `svg` on success, `error` on failure. */
-export interface DiagramState {
-  svg?: string;
-  error?: string;
-}
+export { renderDiagram } from '@knowvah/dot-core/browser';
+export type { DiagramState } from '@knowvah/dot-core/browser';
 
 /**
- * Render a DOT string to inline SVG (or an error message) in the browser.
- * graphviz-ts is imported lazily so it is only fetched when a diagram mounts.
- */
-export async function renderDiagram(
-  dot: string,
-  engine: string,
-  useCurrentColor: boolean,
-): Promise<DiagramState> {
-  try {
-    const { tryRenderSvg } = await import('graphviz-ts');
-    const result = tryRenderSvg(dot, engine as EngineName);
-    if (result.svg != null) {
-      const inline = toInlineSvg(result.svg);
-      return { svg: useCurrentColor ? currentColorRemap(inline) : inline };
-    }
-    return {
-      error: result.errors?.[0]?.friendlyMessage ?? 'Failed to render graph.',
-    };
-  } catch (e) {
-    return { error: e instanceof Error ? e.message : String(e) };
-  }
-}
-
-/**
- * `<DotDiagram>` — renders its `graph` prop (a URI-encoded DOT string) to
- * SVG on mount. Emitted by the markdown-it plugin in client mode.
+ * `<DotDiagram>` — renders its `graph` prop (a URI-encoded DOT string) to SVG on
+ * mount. Emitted by the markdown-it plugin in client mode.
  */
 export const DotDiagram = defineComponent({
   name: 'DotDiagram',

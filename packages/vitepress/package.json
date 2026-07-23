@@ -45,6 +45,9 @@
     "demo:build": "vitepress build demo",
     "demo:dev": "vitepress dev demo"
   },
+  "dependencies": {
+    "@knowvah/dot-core": "workspace:*"
+  },
   "peerDependencies": {
     "graphviz-ts": ">=0.1.0",
     "vitepress": "^1.0.0",
