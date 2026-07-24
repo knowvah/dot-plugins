@@ -2,10 +2,16 @@ import { describe, it, expect } from 'vitest';
 import MarkdownIt from 'markdown-it';
 import { extendMarkdownIt } from './markdown.js';
 
-function render(src: string, useCurrentColor = false): string {
-  return extendMarkdownIt(new MarkdownIt({ html: true }), 'dot', useCurrentColor).render(
-    src,
-  );
+function render(
+  src: string,
+  useCurrentColor = false,
+  defaultEngine = 'dot',
+): string {
+  return extendMarkdownIt(
+    new MarkdownIt({ html: true }),
+    () => defaultEngine,
+    () => useCurrentColor,
+  ).render(src);
 }
 
 describe('extendMarkdownIt — VS Code Markdown preview', () => {
@@ -48,5 +54,22 @@ describe('extendMarkdownIt — VS Code Markdown preview', () => {
   it('remaps black to currentColor when useCurrentColor is enabled', () => {
     const html = render('```dot\ndigraph { a -> b }\n```\n', true);
     expect(html).toContain('currentColor');
+  });
+
+  it('reads the engine + color resolvers per render (live settings)', () => {
+    let engine = 'dot';
+    let useCurrentColor = false;
+    const md = extendMarkdownIt(
+      new MarkdownIt({ html: true }),
+      () => engine,
+      () => useCurrentColor,
+    );
+    const first = md.render('```dot\ndigraph { a -> b }\n```\n');
+    expect(first).not.toContain('currentColor');
+    // Change the "settings" without rebuilding the cached markdown-it instance.
+    engine = 'neato';
+    useCurrentColor = true;
+    const second = md.render('```dot\ndigraph { a -> b }\n```\n');
+    expect(second).toContain('currentColor'); // picked up on the next render
   });
 });

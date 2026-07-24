@@ -46,13 +46,13 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
     vscode.workspace.onDidChangeTextDocument((e) => manager.onDidChange(e)),
   );
 
-  // The Markdown preview uses the configured default engine for blocks with no
-  // per-block `engine=` directive, and the configured currentColor remap. Both
-  // are read here (per extendMarkdownIt call) so a settings change applies on
-  // the next preview refresh.
+  // Pass the config readers as resolvers (not their current values): VS Code
+  // builds the Markdown preview's markdown-it instance once, so the fence rule
+  // must read `dot.preview.defaultEngine` / `dot.preview.useCurrentColor` per
+  // render to observe a settings change (on the next preview render, no reload).
   return {
     extendMarkdownIt: (md) =>
-      extendMarkdownIt(md, configuredDefaultEngine(), configuredUseCurrentColor()),
+      extendMarkdownIt(md, configuredDefaultEngine, configuredUseCurrentColor),
   };
 }
 
