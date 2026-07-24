@@ -48,6 +48,12 @@ wrapper on the server and fills in the SVG on mount (client-side).
 | `wrapperClass` | `string` | `"dot-diagram"` | Wrapper class (error panel: `<class>-error`). |
 | `useCurrentColor` | `boolean` | `false` | Remap black → `currentColor` for theme-aware diagrams. |
 
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
+
 ## License
 
 MIT © Knowvah

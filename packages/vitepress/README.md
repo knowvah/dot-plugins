@@ -202,6 +202,12 @@ prolog/DOCTYPE, and emits the inline `<svg>` in a wrapper `<div>`. Non-matching
 fences (and `no-render` blocks) fall through to VitePress's normal Shiki
 highlighting, untouched.
 
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
+
 ## License
 
 MIT © Knowvah

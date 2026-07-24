@@ -77,6 +77,12 @@ Same `DotPluginOptions` as [`@knowvah/dot-core`](../core): `renderLanguage`,
 and `timeout` / `onError` (build mode). Per-block via the code meta:
 `` ```dot engine=neato ``, `` ```dot no-render ``, `` ```dot client ``.
 
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
+
 ## License
 
 MIT © Knowvah

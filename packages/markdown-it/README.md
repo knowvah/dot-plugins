@@ -44,6 +44,12 @@ md.render('```dot\ndigraph { a -> b }\n```'); // -> <div class="dot-diagram"><sv
 | `emitDotDiagramElement(dot, engine, cfg)` | The default `<dot-diagram>` client emitter. |
 | `parseFenceInfo` | Re-exported from `@knowvah/dot-core`. |
 
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
+
 ## License
 
 MIT © Knowvah

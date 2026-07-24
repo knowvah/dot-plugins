@@ -102,6 +102,12 @@ lowercased) at every entry point — `parseFenceInfo`, `resolveConfig`, and both
 render functions — so `engine=Neato`, `NEATO`, and `neato` are equivalent
 wherever an engine is accepted. `normalizeEngine(name)` is exported for reuse.
 
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
+
 ## License
 
 MIT © Knowvah
