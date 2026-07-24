@@ -2,7 +2,7 @@
 
 Syntax highlighting and a **live SVG preview** for Graphviz **DOT** (`.dot` /
 `.gv`) files, powered by the pure-TypeScript
-[graphviz-ts](https://www.npmjs.com/package/graphviz-ts) engine (via
+[@knowvah/dot-engine](https://www.npmjs.com/package/@knowvah/dot-engine) (via
 [`@knowvah/dot-core`](../core)). Rendering happens **in the extension host** —
 no external Graphviz install, no `dot` binary on your PATH, no network.
 
@@ -77,7 +77,7 @@ pnpm --filter dot-vscode package      # vsce → dot-vscode-<version>.vsix
 
 `build` bundles the extension host (`dist/extension.js`) and the render worker
 (`dist/render-worker.js`) with esbuild, inlining `@knowvah/dot-core` and
-`graphviz-ts`, so the packaged `.vsix` ships with no `node_modules`. To debug,
+`@knowvah/dot-engine`, so the packaged `.vsix` ships with no `node_modules`. To debug,
 open this folder in VS Code and press **F5** (Run Extension) after a `build`.
 
 ## Architecture
@@ -111,7 +111,7 @@ dropped (latest edit wins).
   async, so ` ```dot ` blocks in the Markdown preview render in-process on the
   extension host — a pathological non-terminating graph there could hang the
   preview (the standalone file preview is unaffected; it uses the worker above).
-  graphviz-ts's documented infinite-loop cases are rare.
+  @knowvah/dot-engine's documented infinite-loop cases are rare.
 - **HTML labels in the Markdown preview.** VS Code's built-in Markdown preview
   sanitizes rendered HTML (DOMPurify). Standard SVG shapes and text render, but
   `<foreignObject>` — which Graphviz emits for HTML-like labels
@@ -124,6 +124,6 @@ dropped (latest edit wins).
 
 The extension code is **MIT** (see [LICENSE](LICENSE)). One bundled asset —
 `syntaxes/dot.tmLanguage.json` (the `source.dot` TextMate grammar) — is reused
-from graphviz-ts and is licensed **EPL-2.0**; it retains that license rather
+from @knowvah/dot-engine and is licensed **EPL-2.0**; it retains that license rather
 than MIT. Both licenses permit redistribution; the marketplace listing notes
 this rather than claiming a blanket MIT license.

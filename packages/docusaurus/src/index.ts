@@ -25,7 +25,7 @@ import {
   type DotPluginOptions,
   type ResolvedConfig,
 } from '@knowvah/dot-core';
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 import type { Root, Code } from 'mdast';
 
 export type { DotPluginOptions } from '@knowvah/dot-core';

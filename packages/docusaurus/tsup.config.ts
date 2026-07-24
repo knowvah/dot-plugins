@@ -9,13 +9,13 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  // core + dot-react are runtime deps; react/graphviz-ts are peers;
+  // core + dot-react are runtime deps; react/@knowvah/dot-engine are peers;
   // unist-util-visit resolves at the consumer. All external, not bundled.
   external: [
     '@knowvah/dot-core',
     '@knowvah/dot-core/browser',
     '@knowvah/dot-react',
-    'graphviz-ts',
+    '@knowvah/dot-engine',
     'react',
     'react/jsx-runtime',
     'unist-util-visit',

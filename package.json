@@ -3,24 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Render Graphviz DOT diagrams in static-site generators (VitePress, Eleventy, Docusaurus) — powered by the pure-TypeScript graphviz-ts engine.",
+  "description": "Render Graphviz DOT diagrams in static-site generators (VitePress, Eleventy, Docusaurus) — powered by the pure-TypeScript @knowvah/dot-engine.",
   "license": "MIT",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm -r build && changeset publish",
-    "release:ci": "changeset publish",
     "publish:local": "bash scripts/publish.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.31.1"
   }
 }

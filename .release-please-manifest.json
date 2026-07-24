@@ -1,0 +1,8 @@
+{
+  "packages/core": "0.1.0",
+  "packages/markdown-it": "0.1.0",
+  "packages/vitepress": "0.1.0",
+  "packages/eleventy": "0.1.0",
+  "packages/docusaurus": "0.1.0",
+  "packages/react": "0.1.0"
+}
