@@ -33,18 +33,18 @@ pnpm -r typecheck
 
 ## Releasing
 
-Versioning and publishing use [Changesets](https://github.com/changesets/changesets).
+Versioning and publishing are driven by
+[release-please](https://github.com/googleapis/release-please) (manifest mode)
+from [Conventional Commits](https://www.conventionalcommits.org/). Commit and PR
+titles determine each package's next version — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```bash
-pnpm changeset          # describe a change (pick packages + bump type)
-```
-
-On push to `main`, `.github/workflows/release.yml` opens/updates a
-"Version Packages" PR that applies the changesets (bumping versions + changelogs);
-merging it publishes the changed packages to npm. Requires a free `knowvah` npm
-org and the repo secret `NPM_TOKEN` (an npm automation token). `@knowvah/dot-core`
-publishes first; the adapters' `workspace:*` dep on it is rewritten to the real
-version at publish time.
+On push to `main`, `.github/workflows/release.yml` opens/updates a combined
+**release PR** that bumps each changed package's version and CHANGELOG. Merging
+that release PR creates per-package git tags + GitHub Releases, then publishes
+the released packages to npm via **OIDC trusted publishing** — no `NPM_TOKEN`,
+and provenance attestations are attached automatically. At publish time each
+package is packed with `pnpm pack`, so the adapters' `workspace:*` dep on
+`@knowvah/dot-core` is rewritten to the real version in the published tarball.
 
 The `dot-vscode` extension is `private` (excluded from the npm release). It
 publishes separately to the VS Code Marketplace / Open VSX via
