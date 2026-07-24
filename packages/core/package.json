@@ -1,14 +1,14 @@
 {
   "name": "@knowvah/dot-core",
   "version": "0.1.0",
-  "description": "Framework-agnostic Graphviz DOT → SVG render engine for static-site plugins, powered by the pure-TypeScript graphviz-ts engine.",
+  "description": "Framework-agnostic Graphviz DOT → SVG render engine for static-site plugins, powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",
   "keywords": [
     "graphviz",
     "dot",
     "svg",
-    "graphviz-ts",
+    "@knowvah/dot-engine",
     "render"
   ],
   "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/core#readme",

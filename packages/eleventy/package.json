@@ -1,7 +1,7 @@
 {
   "name": "@knowvah/eleventy-plugin-dot",
   "version": "0.1.0",
-  "description": "Render Graphviz DOT fenced code blocks to inline SVG in Eleventy (11ty) at build time — powered by the pure-TypeScript graphviz-ts engine.",
+  "description": "Render Graphviz DOT fenced code blocks to inline SVG in Eleventy (11ty) at build time — powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",
   "keywords": [
@@ -12,7 +12,7 @@
     "dot",
     "markdown-it",
     "svg",
-    "graphviz-ts"
+    "@knowvah/dot-engine"
   ],
   "homepage": "https://github.com/knowvah/dot-plugins/tree/main/packages/eleventy#readme",
   "repository": {

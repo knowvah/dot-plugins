@@ -2,7 +2,7 @@
 
 The framework-agnostic **Graphviz DOT → SVG** render engine that powers the
 `@knowvah/*-plugin-dot` adapters (VitePress, Eleventy, Docusaurus). Pure
-TypeScript, powered by [graphviz-ts](https://www.npmjs.com/package/graphviz-ts).
+TypeScript, powered by [@knowvah/dot-engine](https://www.npmjs.com/package/@knowvah/dot-engine).
 
 You usually consume one of the adapters, not this package directly — but it's
 public so you can build your own adapter for any generator.
@@ -10,10 +10,10 @@ public so you can build your own adapter for any generator.
 ## Install
 
 ```bash
-npm i @knowvah/dot-core graphviz-ts
+npm i @knowvah/dot-core @knowvah/dot-engine
 ```
 
-`graphviz-ts` is a peer dependency.
+`@knowvah/dot-engine` is a peer dependency.
 
 ## Entry points
 

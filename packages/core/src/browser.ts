@@ -1,6 +1,6 @@
 /**
  * Browser-side render: a DOT string becomes SVG (or an error message), for
- * client-mode components. graphviz-ts is imported lazily so it is only fetched
+ * client-mode components. @knowvah/dot-engine is imported lazily so it is only fetched
  * when a diagram actually mounts. No Node built-ins — safe for the browser.
  *
  * This is the `@knowvah/dot-core/browser` entry point.

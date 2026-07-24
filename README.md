@@ -2,7 +2,7 @@
 
 Render [Graphviz](https://graphviz.org/) **DOT** diagrams in static-site
 generators, powered by the pure-TypeScript
-[graphviz-ts](https://www.npmjs.com/package/graphviz-ts) engine — at build time
+[@knowvah/dot-engine](https://www.npmjs.com/package/@knowvah/dot-engine) — at build time
 (inline SVG, zero client JS) or client-side.
 
 A pnpm workspace. The framework-agnostic render engine lives in one place;

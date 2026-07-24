@@ -12,7 +12,7 @@ of the adapter packages.
 ## Install
 
 ```bash
-npm i @knowvah/dot-markdown-it graphviz-ts
+npm i @knowvah/dot-markdown-it @knowvah/dot-engine
 ```
 
 ## Usage

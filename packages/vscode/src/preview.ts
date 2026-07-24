@@ -13,7 +13,7 @@ export interface PreviewResult {
   error?: string;
 }
 
-/** The built-in layout engines (graphviz-ts throws on any other name, so a name
+/** The built-in layout engines (@knowvah/dot-engine throws on any other name, so a name
  * from a comment or setting must be validated against this set before use). */
 export const BUILTIN_ENGINES: readonly BuiltinEngine[] = [
   'dot',

@@ -3,7 +3,7 @@
  *
  * Render Graphviz DOT fenced code blocks to inline SVG in VitePress, **at build
  * time** — no client-side JavaScript, no flash of unrendered code — using the
- * pure-TypeScript synchronous {@link https://www.npmjs.com/package/graphviz-ts | graphviz-ts}
+ * pure-TypeScript synchronous {@link https://www.npmjs.com/package/@knowvah/dot-engine | @knowvah/dot-engine}
  * engine.
  *
  * @example

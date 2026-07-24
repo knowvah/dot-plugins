@@ -21,7 +21,7 @@ import {
 // --- child-process worker (the `timeout` safe-mode) -------------------------
 
 // Inline ESM worker: read DOT from stdin, render, write a JSON RenderResult.
-// Passing the graphviz-ts module URL + engine via env avoids any dependency on
+// Passing the @knowvah/dot-engine module URL + engine via env avoids any dependency on
 // the on-disk layout (bundlers relocate/​split files freely).
 const CHILD_SCRIPT = [
   'const { tryRenderSvg } = await import(process.env.GV_MODULE);',

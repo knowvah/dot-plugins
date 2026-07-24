@@ -67,7 +67,7 @@ export function escapeHtml(s: string): string {
 
 /**
  * Normalize a layout-engine name for case-insensitive matching. Graphviz engine
- * names are lowercase (`dot`, `neato`, …) and graphviz-ts throws on any other
+ * names are lowercase (`dot`, `neato`, …) and @knowvah/dot-engine throws on any other
  * spelling, so callers should normalize user-supplied names (`Neato`, `FDP`)
  * before rendering or comparing.
  */
@@ -98,7 +98,7 @@ export function parseFenceInfo(info: string): ParsedFence {
 }
 
 /**
- * graphviz-ts emits a standalone SVG document (`<?xml ?>` prolog + `<!DOCTYPE>`
+ * @knowvah/dot-engine emits a standalone SVG document (`<?xml ?>` prolog + `<!DOCTYPE>`
  * + comment). Strip everything before the root `<svg` so the fragment is valid
  * to embed inline inside HTML.
  */

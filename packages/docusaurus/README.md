@@ -2,7 +2,7 @@
 
 Render [Graphviz](https://graphviz.org/) **DOT** fenced code blocks as diagrams
 in [Docusaurus](https://docusaurus.io/), powered by the pure-TypeScript
-[graphviz-ts](https://www.npmjs.com/package/graphviz-ts) engine and the shared
+[@knowvah/dot-engine](https://www.npmjs.com/package/@knowvah/dot-engine) and the shared
 [`@knowvah/dot-core`](../core) render engine.
 
 A remark plugin renders ` ```dot ` blocks. **Build mode** (the default) renders
@@ -14,10 +14,10 @@ React component that renders in the browser instead.
 ## Install
 
 ```bash
-npm i -D @knowvah/docusaurus-plugin-dot graphviz-ts
+npm i -D @knowvah/docusaurus-plugin-dot @knowvah/dot-engine
 ```
 
-`react` and `graphviz-ts` are peer dependencies (Docusaurus provides React).
+`react` and `@knowvah/dot-engine` are peer dependencies (Docusaurus provides React).
 
 ## Usage
 

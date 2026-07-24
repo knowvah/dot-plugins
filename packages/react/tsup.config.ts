@@ -11,7 +11,7 @@ export default defineConfig({
   external: [
     '@knowvah/dot-core',
     '@knowvah/dot-core/browser',
-    'graphviz-ts',
+    '@knowvah/dot-engine',
     'react',
     'react/jsx-runtime',
   ],

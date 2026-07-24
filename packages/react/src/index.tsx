@@ -1,6 +1,6 @@
 /**
  * `<DotDiagram>` — a React component that renders Graphviz DOT to SVG in the
- * browser, via `@knowvah/dot-core/browser`. graphviz-ts is loaded lazily on
+ * browser, via `@knowvah/dot-core/browser`. @knowvah/dot-engine is loaded lazily on
  * first render. Server-side rendering emits an empty wrapper; the SVG is filled
  * in on mount.
  *
