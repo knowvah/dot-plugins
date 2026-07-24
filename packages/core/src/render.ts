@@ -7,8 +7,8 @@
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { tryRenderSvg } from 'graphviz-ts';
-import type { EngineName, GvError, RenderResult } from 'graphviz-ts';
+import { tryRenderSvg } from '@knowvah/dot-engine';
+import type { EngineName, GvError, RenderResult } from '@knowvah/dot-engine';
 import {
   currentColorRemap,
   escapeHtml,
@@ -34,7 +34,7 @@ const CHILD_SCRIPT = [
 let cachedModuleUrl: string | undefined;
 function graphvizModuleUrl(): string {
   cachedModuleUrl ??= pathToFileURL(
-    createRequire(import.meta.url).resolve('graphviz-ts'),
+    createRequire(import.meta.url).resolve('@knowvah/dot-engine'),
   ).href;
   return cachedModuleUrl;
 }

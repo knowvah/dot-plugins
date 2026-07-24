@@ -8,7 +8,7 @@
  * delegate to the host's existing fence rule.
  */
 import type MarkdownIt from 'markdown-it';
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 import {
   escapeHtml,
   parseFenceInfo,

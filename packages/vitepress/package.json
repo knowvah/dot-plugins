@@ -53,7 +53,7 @@
     "@knowvah/dot-markdown-it": "workspace:*"
   },
   "peerDependencies": {
-    "graphviz-ts": ">=0.1.0",
+    "@knowvah/dot-engine": ">=1.0.0",
     "vitepress": "^1.0.0",
     "vue": "^3.4.0"
   },
@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.0.0",
-    "graphviz-ts": "^0.1.0",
+    "@knowvah/dot-engine": "^1.0.0",
     "markdown-it": "^14.1.0",
     "tsup": "^8.5.0",
     "typescript": "^6.0.3",

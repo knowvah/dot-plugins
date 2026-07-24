@@ -5,7 +5,7 @@
  *
  * This is the `@knowvah/dot-core/browser` entry point.
  */
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 import { currentColorRemap, normalizeEngine, toInlineSvg } from './shared.js';
 
 /** The rendered outcome: `svg` on success, `error` on failure. */
@@ -21,7 +21,7 @@ export async function renderDiagram(
   useCurrentColor: boolean,
 ): Promise<DiagramState> {
   try {
-    const { tryRenderSvg } = await import('graphviz-ts');
+    const { tryRenderSvg } = await import('@knowvah/dot-engine');
     const result = tryRenderSvg(dot, normalizeEngine(engine) as EngineName);
     if (result.svg != null) {
       const inline = toInlineSvg(result.svg);

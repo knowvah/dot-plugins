@@ -5,7 +5,7 @@
  * `render-service.ts`), so this stays trivially unit-testable.
  */
 import { escapeHtml, normalizeEngine } from '@knowvah/dot-core';
-import type { BuiltinEngine } from 'graphviz-ts';
+import type { BuiltinEngine } from '@knowvah/dot-engine';
 
 /** A rendered preview: either inline SVG, or a human-readable error message. */
 export interface PreviewResult {

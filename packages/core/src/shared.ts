@@ -2,7 +2,7 @@
  * Browser-safe pure helpers and option types shared by the build-time
  * markdown-it plugin and the client-side Vue component. No Node built-ins here.
  */
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 
 /** How a diagram is rendered: at build time (inline static SVG) or client-side. */
 export type RenderMode = 'build' | 'client';
