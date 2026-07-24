@@ -39,6 +39,17 @@ export type ClientEmitter = (
 export interface DotMarkdownOptions extends DotPluginOptions {
   /** Client-mode emitter; defaults to {@link emitDotDiagramElement}. */
   emitClient?: ClientEmitter;
+  /**
+   * Resolve the default engine (for a block with no ` engine= ` directive) at
+   * render time instead of once at install. This lets a host whose markdown-it
+   * instance is cached across renders — e.g. VS Code's Markdown preview, which
+   * rebuilds only on window reload — observe a changed setting on the next
+   * render. Returning `undefined` falls back to the static `defaultEngine`.
+   */
+  resolveDefaultEngine?: () => EngineName | undefined;
+  /** Resolve `useCurrentColor` at render time, for the same reason as
+   * {@link resolveDefaultEngine}. `undefined` falls back to the static value. */
+  resolveUseCurrentColor?: () => boolean | undefined;
 }
 
 /** Default client emitter: the `<dot-diagram>` custom element (register it with
@@ -72,7 +83,12 @@ export function dotMarkdown(
   md: MarkdownIt,
   options: DotMarkdownOptions = {},
 ): void {
-  const { emitClient = emitDotDiagramElement, ...pluginOptions } = options;
+  const {
+    emitClient = emitDotDiagramElement,
+    resolveDefaultEngine,
+    resolveUseCurrentColor,
+    ...pluginOptions
+  } = options;
   const cfg = resolveConfig(pluginOptions);
   const delegate = md.renderer.rules.fence ?? fallbackFence;
 
@@ -82,11 +98,20 @@ export function dotMarkdown(
     if (info.lang !== cfg.renderLanguage || info.noRender) {
       return delegate(tokens, idx, opts, env, self);
     }
-    const engine = (info.engine ?? cfg.defaultEngine) as EngineName;
+    // Precedence: per-block ` engine= ` → live resolver → static default.
+    const engine = (info.engine ??
+      resolveDefaultEngine?.() ??
+      cfg.defaultEngine) as EngineName;
     const mode = info.mode ?? cfg.mode;
+    // A live `useCurrentColor` overrides the resolved config for this render.
+    const liveCurrentColor = resolveUseCurrentColor?.();
+    const renderCfg =
+      liveCurrentColor === undefined
+        ? cfg
+        : { ...cfg, useCurrentColor: liveCurrentColor };
     return mode === 'client'
-      ? emitClient(token.content, engine, cfg)
-      : renderDotHtml(token.content, engine, cfg);
+      ? emitClient(token.content, engine, renderCfg)
+      : renderDotHtml(token.content, engine, renderCfg);
   };
 }
 
