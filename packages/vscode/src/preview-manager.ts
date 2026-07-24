@@ -45,6 +45,15 @@ function renderTimeoutMs(): number {
   return Math.max(1, seconds) * 1000;
 }
 
+/** Whether to remap the diagram's black strokes/text to the editor foreground
+ * (`dot.preview.useCurrentColor`). Off by default: Graphviz paints a white
+ * diagram background, so native black stays legible in every theme. */
+export function configuredUseCurrentColor(): boolean {
+  return vscode.workspace
+    .getConfiguration('dot')
+    .get<boolean>('preview.useCurrentColor', false);
+}
+
 function engineKey(uri: vscode.Uri): string {
   return `${ENGINE_KEY_PREFIX}${uri.toString()}`;
 }
@@ -106,7 +115,11 @@ export class PreviewManager
     const version = doc.version;
     const engine = this.engineOf(doc);
     panel.title = previewTitle(doc, engine);
-    const result = await this.renderer.render({ dot: text, engine });
+    const result = await this.renderer.render({
+      dot: text,
+      engine,
+      useCurrentColor: configuredUseCurrentColor(),
+    });
     // Drop a stale render: the panel closed, or a newer edit superseded it.
     if (this.panels.get(doc.uri.toString()) !== panel || doc.version !== version) return;
     panel.webview.html = previewDocument(result, panel.webview.cspSource);

@@ -12,6 +12,9 @@ import type { PreviewResult } from './preview.js';
 export interface RenderRequest {
   dot: string;
   engine: string;
+  /** Remap the diagram's black strokes/text to CSS `currentColor` so it
+   * follows the editor theme. Omitted/undefined renders native (black). */
+  useCurrentColor?: boolean;
 }
 
 // Shape the worker posts back (a dot-core DotSvgResult; error is GvError-like).

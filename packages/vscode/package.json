@@ -52,6 +52,11 @@
           "default": 60,
           "minimum": 1,
           "markdownDescription": "Maximum time (in seconds) to render a `.dot`/`.gv` file preview before treating the graph as non-terminating and aborting to a timeout message. Rendering runs in a worker thread, so this never freezes the editor — raise it for very large graphs."
+        },
+        "dot.preview.useCurrentColor": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Remap the diagram's black strokes and text to the editor's foreground color (`currentColor`) so the diagram follows your theme. Off by default: Graphviz renders diagrams on a white background, so black stays legible in every theme — with this on, a dark theme's near-white foreground would be nearly invisible on that white canvas. Enable it only if you also make the graph background transparent (e.g. `bgcolor=\"transparent\"` in the DOT source)."
         }
       }
     },

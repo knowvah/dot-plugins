@@ -104,6 +104,14 @@ dropped (latest edit wins).
   rendering is off the main thread, this never freezes the editor; raise it for
   very large graphs, lower it if you want a runaway graph reported sooner. The
   value is read per render, so changes take effect immediately (no reload).
+- **`dot.preview.useCurrentColor`** (default `false`) — when on, the diagram's
+  black strokes and text are remapped to the editor's foreground color so the
+  diagram follows your theme. Off by default because Graphviz paints a white
+  diagram background, so native black stays legible in any theme; with it on, a
+  dark theme's near-white foreground would nearly vanish on that white canvas.
+  Enable it only if you also make the graph background transparent (e.g.
+  `bgcolor="transparent"`). The file preview reads this per render; the Markdown
+  preview picks it up on the next refresh.
 
 ## Known limitations (v1)
 

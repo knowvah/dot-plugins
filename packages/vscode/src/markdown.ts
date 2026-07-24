@@ -19,10 +19,16 @@ const renderInline: ClientEmitter = (dot, engine, cfg) =>
   renderDotHtml(dot, engine, cfg);
 
 /** VS Code's `extendMarkdownIt` contribution: install the DOT fence renderer.
- * `defaultEngine` is the engine for blocks without an ` engine=… ` directive. */
-export function extendMarkdownIt(md: MarkdownIt, defaultEngine = 'dot'): MarkdownIt {
+ * `defaultEngine` is the engine for blocks without an ` engine=… ` directive.
+ * `useCurrentColor` remaps black strokes/text to `currentColor` (theme-aware);
+ * off by default so diagrams render native black on Graphviz's white canvas. */
+export function extendMarkdownIt(
+  md: MarkdownIt,
+  defaultEngine = 'dot',
+  useCurrentColor = false,
+): MarkdownIt {
   return md.use(dotMarkdown, {
-    useCurrentColor: true,
+    useCurrentColor,
     defaultEngine,
     emitClient: renderInline,
   });

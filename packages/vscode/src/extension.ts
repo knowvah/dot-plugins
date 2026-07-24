@@ -7,7 +7,11 @@
  */
 import type MarkdownIt from 'markdown-it';
 import * as vscode from 'vscode';
-import { PreviewManager, configuredDefaultEngine } from './preview-manager.js';
+import {
+  PreviewManager,
+  configuredDefaultEngine,
+  configuredUseCurrentColor,
+} from './preview-manager.js';
 import { extendMarkdownIt } from './markdown.js';
 
 /** The API VS Code reads from `activate()` to extend the Markdown preview. */
@@ -43,8 +47,13 @@ export function activate(context: vscode.ExtensionContext): DotExtensionApi {
   );
 
   // The Markdown preview uses the configured default engine for blocks with no
-  // per-block `engine=` directive.
-  return { extendMarkdownIt: (md) => extendMarkdownIt(md, configuredDefaultEngine()) };
+  // per-block `engine=` directive, and the configured currentColor remap. Both
+  // are read here (per extendMarkdownIt call) so a settings change applies on
+  // the next preview refresh.
+  return {
+    extendMarkdownIt: (md) =>
+      extendMarkdownIt(md, configuredDefaultEngine(), configuredUseCurrentColor()),
+  };
 }
 
 export function deactivate(): void {

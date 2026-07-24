@@ -2,8 +2,10 @@ import { describe, it, expect } from 'vitest';
 import MarkdownIt from 'markdown-it';
 import { extendMarkdownIt } from './markdown.js';
 
-function render(src: string): string {
-  return extendMarkdownIt(new MarkdownIt({ html: true })).render(src);
+function render(src: string, useCurrentColor = false): string {
+  return extendMarkdownIt(new MarkdownIt({ html: true }), 'dot', useCurrentColor).render(
+    src,
+  );
 }
 
 describe('extendMarkdownIt — VS Code Markdown preview', () => {
@@ -35,5 +37,16 @@ describe('extendMarkdownIt — VS Code Markdown preview', () => {
     // neato lays out `graph { a -- b }`; just assert it renders to SVG.
     const html = render('```dot engine=neato\ngraph { a -- b }\n```\n');
     expect(html).toContain('<svg');
+  });
+
+  it('renders native black by default (no currentColor remap)', () => {
+    const html = render('```dot\ndigraph { a -> b }\n```\n');
+    expect(html).toContain('<svg');
+    expect(html).not.toContain('currentColor');
+  });
+
+  it('remaps black to currentColor when useCurrentColor is enabled', () => {
+    const html = render('```dot\ndigraph { a -> b }\n```\n', true);
+    expect(html).toContain('currentColor');
   });
 });
