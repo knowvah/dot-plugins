@@ -9,18 +9,11 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "pnpm -r build && changeset publish",
-    "release:ci": "changeset publish",
     "publish:local": "bash scripts/publish.sh"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"
     ]
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.31.1"
   }
 }
