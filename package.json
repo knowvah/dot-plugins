@@ -12,6 +12,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm -r build && changeset publish",
+    "release:ci": "changeset publish",
     "publish:local": "bash scripts/publish.sh"
   },
   "pnpm": {

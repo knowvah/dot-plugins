@@ -52,6 +52,10 @@ jobs:
       - uses: changesets/action@v1
         with:
           version: pnpm version-packages
-          publish: pnpm release
+          # release:ci = `changeset publish` WITHOUT a rebuild: the `pnpm -r
+          # build` step above already produced dist/ on this runner, and job
+          # steps share the filesystem. (Local/manual publishing uses `pnpm
+          # release`, which is self-contained and builds first.)
+          publish: pnpm release:ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
