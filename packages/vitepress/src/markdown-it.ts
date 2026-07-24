@@ -7,7 +7,7 @@
  * wrapper from the package root.
  */
 import type MarkdownIt from 'markdown-it';
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 import { escapeHtml, type ResolvedConfig } from '@knowvah/dot-core';
 import { dotMarkdown as dotMarkdownBase } from '@knowvah/dot-markdown-it';
 import type { DotPluginOptions } from '@knowvah/dot-core';

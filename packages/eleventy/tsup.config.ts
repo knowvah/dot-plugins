@@ -9,12 +9,12 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  // workspace deps + graphviz-ts peer + markdown-it/eleventy host — all external.
+  // workspace deps + @knowvah/dot-engine peer + markdown-it/eleventy host — all external.
   external: [
     '@knowvah/dot-core',
     '@knowvah/dot-core/element',
     '@knowvah/dot-markdown-it',
-    'graphviz-ts',
+    '@knowvah/dot-engine',
     'markdown-it',
     '@11ty/eleventy',
   ],

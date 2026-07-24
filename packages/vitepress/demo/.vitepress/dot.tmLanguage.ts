@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: EPL-2.0
 //
 // Minimal TextMate grammar for the Graphviz DOT language, reused (verbatim)
-// from the graphviz-ts docs (docs-site/.vitepress/dot.tmLanguage.ts). It is
-// EPL-2.0 — the license of graphviz-ts — not the MIT license of this plugin;
+// from the @knowvah/dot-engine docs (docs-site/.vitepress/dot.tmLanguage.ts). It is
+// EPL-2.0 — the license of @knowvah/dot-engine — not the MIT license of this plugin;
 // this single demo file retains its original license. Registered with
 // VitePress/Shiki via markdown.languages so `dot` fences the plugin does not
 // render (e.g. `no-render` blocks) are syntax-highlighted instead of falling

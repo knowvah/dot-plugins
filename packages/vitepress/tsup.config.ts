@@ -10,13 +10,13 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  // The core engine is a runtime dependency; graphviz-ts is a peer; vitepress/
+  // The core engine is a runtime dependency; @knowvah/dot-engine is a peer; vitepress/
   // markdown-it/vue are host-provided. All resolved at the consumer, not bundled.
   external: [
     '@knowvah/dot-core',
     '@knowvah/dot-core/browser',
     '@knowvah/dot-markdown-it',
-    'graphviz-ts',
+    '@knowvah/dot-engine',
     'vitepress',
     'markdown-it',
     'vue',

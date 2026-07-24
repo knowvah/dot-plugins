@@ -7,7 +7,7 @@
  */
 import { parentPort } from 'node:worker_threads';
 import { renderDotSvg, resolveConfig, type ResolvedConfig } from '@knowvah/dot-core';
-import type { EngineName } from 'graphviz-ts';
+import type { EngineName } from '@knowvah/dot-engine';
 
 // `useCurrentColor` → diagrams inherit the editor foreground in any theme.
 const CONFIG: ResolvedConfig = resolveConfig({ useCurrentColor: true });

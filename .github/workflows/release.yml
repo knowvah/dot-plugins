@@ -1,61 +1,72 @@
 name: Release
 
-# Changesets + npm Trusted Publishing (OIDC). Pushes to main open/update a
-# "Version Packages" PR that bumps versions + changelogs from the .changeset/
-# entries; merging it publishes the changed packages to npm via OIDC — no
-# long-lived NPM_TOKEN. Each @knowvah/* package needs a trusted publisher
-# configured on npmjs.com: repo knowvah/dot-plugins, workflow release.yml,
-# environment "release". npm publishes provenance attestations automatically.
+# release-please (manifest mode) + npm OIDC trusted publishing.
+# Pushes to main open/update a combined "release PR" that bumps each changed
+# package + CHANGELOG from Conventional Commits. Merging that PR creates
+# per-package tags + GitHub Releases; this workflow then publishes each released
+# package to npm via OIDC (no NPM_TOKEN, provenance automatic).
+#
+# Each @knowvah/* package has a trusted publisher on npmjs.com pinned to repo
+# knowvah/dot-plugins, workflow file `release.yml`, environment `release`.
+# DO NOT rename this file or change the environment, or the publishers break.
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 concurrency: release-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write # OIDC trusted publishing + provenance
 
 jobs:
   release:
     runs-on: ubuntu-latest
     environment: release
-    permissions:
-      contents: write
-      pull-requests: write
-      id-token: write # OIDC trusted publishing + provenance
     steps:
       - uses: actions/checkout@v7
 
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # The steps below run only when a release PR was merged (releases cut).
       - uses: pnpm/action-setup@v6
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         with:
           version: 10
 
       - uses: actions/setup-node@v7
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
       # Trusted publishing (OIDC) requires npm >= 11.5.1.
-      - run: npm install -g npm@latest
+      - if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: npm install -g npm@latest
 
-      - run: pnpm install --frozen-lockfile
+      - if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: pnpm install --frozen-lockfile
 
-      # Build first: adapter packages resolve @knowvah/dot-core's types via its
-      # exports -> dist/*.d.ts, which don't exist on a clean checkout. Typecheck
-      # before build fails with "Cannot find module '@knowvah/dot-core'".
-      - run: pnpm -r build
+      - if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: pnpm -r build
 
-      - run: pnpm -r typecheck && pnpm -r test
+      # Publish each released package: `pnpm pack` rewrites workspace:* to real
+      # versions; npm (>=11.5.1) uploads the tarball with OIDC + provenance.
+      - if: ${{ steps.release.outputs.releases_created == 'true' }}
         env:
-          GV_FONT_QUIET: '1'
-          GV_TEXT_MEASURER: estimate
-
-      - uses: changesets/action@v1
-        with:
-          version: pnpm version-packages
-          # release:ci = `changeset publish` WITHOUT a rebuild: the `pnpm -r
-          # build` step above already produced dist/ on this runner, and job
-          # steps share the filesystem. (Local/manual publishing uses `pnpm
-          # release`, which is self-contained and builds first.)
-          publish: pnpm release:ci
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PATHS_RELEASED: ${{ steps.release.outputs.paths_released }}
+        run: |
+          set -euo pipefail
+          echo "$PATHS_RELEASED" | jq -r '.[]' | while read -r pkgdir; do
+            echo "==> packing $pkgdir"
+            tgz="$(cd "$pkgdir" && pnpm pack --pack-destination "$RUNNER_TEMP" | tail -1)"
+            echo "==> publishing $tgz"
+            npm publish "$tgz" --provenance --access public
+          done

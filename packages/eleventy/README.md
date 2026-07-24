@@ -2,8 +2,8 @@
 
 Render [Graphviz](https://graphviz.org/) **DOT** fenced code blocks to inline SVG
 in [Eleventy](https://www.11ty.dev/) — **at build time**, no client JS — powered
-by the pure-TypeScript [graphviz-ts](https://www.npmjs.com/package/graphviz-ts)
-engine and the shared [`@knowvah/dot-core`](../core) render engine.
+by the pure-TypeScript [@knowvah/dot-engine](https://www.npmjs.com/package/@knowvah/dot-engine)
+and the shared [`@knowvah/dot-core`](../core) render engine.
 
 Eleventy is a static generator, so this plugin renders diagrams during the build
 and embeds static `<svg>`. It hooks Eleventy's default markdown-it engine.
@@ -11,11 +11,11 @@ and embeds static `<svg>`. It hooks Eleventy's default markdown-it engine.
 ## Install
 
 ```bash
-npm i -D @knowvah/eleventy-plugin-dot graphviz-ts
+npm i -D @knowvah/eleventy-plugin-dot @knowvah/dot-engine
 ```
 
 Requires **Eleventy 2.0+** (uses `amendLibrary`) with its default markdown-it
-engine. `graphviz-ts` is a peer dependency.
+engine. `@knowvah/dot-engine` is a peer dependency.
 
 ## Usage
 
@@ -64,6 +64,12 @@ component that renders in the browser — register it once in your site's JS:
 import { defineDotDiagram } from '@knowvah/eleventy-plugin-dot/client';
 defineDotDiagram();
 ```
+
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
 
 ## License
 

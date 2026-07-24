@@ -7,8 +7,8 @@
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { tryRenderSvg } from 'graphviz-ts';
-import type { EngineName, GvError, RenderResult } from 'graphviz-ts';
+import { tryRenderSvg } from '@knowvah/dot-engine';
+import type { EngineName, GvError, RenderResult } from '@knowvah/dot-engine';
 import {
   currentColorRemap,
   escapeHtml,
@@ -21,7 +21,7 @@ import {
 // --- child-process worker (the `timeout` safe-mode) -------------------------
 
 // Inline ESM worker: read DOT from stdin, render, write a JSON RenderResult.
-// Passing the graphviz-ts module URL + engine via env avoids any dependency on
+// Passing the @knowvah/dot-engine module URL + engine via env avoids any dependency on
 // the on-disk layout (bundlers relocate/​split files freely).
 const CHILD_SCRIPT = [
   'const { tryRenderSvg } = await import(process.env.GV_MODULE);',
@@ -34,7 +34,7 @@ const CHILD_SCRIPT = [
 let cachedModuleUrl: string | undefined;
 function graphvizModuleUrl(): string {
   cachedModuleUrl ??= pathToFileURL(
-    createRequire(import.meta.url).resolve('graphviz-ts'),
+    createRequire(import.meta.url).resolve('@knowvah/dot-engine'),
   ).href;
   return cachedModuleUrl;
 }

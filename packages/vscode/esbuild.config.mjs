@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Bundle the extension host into a single CJS file. `vscode` is provided by the
 // runtime and must stay external; everything else (@knowvah/dot-core,
-// graphviz-ts) is inlined so the .vsix ships with no node_modules.
+// @knowvah/dot-engine) is inlined so the .vsix ships with no node_modules.
 import * as esbuild from 'esbuild';
 
 const watch = process.argv.includes('--watch');

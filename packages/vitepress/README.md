@@ -2,11 +2,10 @@
 
 Render [Graphviz](https://graphviz.org/) **DOT** fenced code blocks to inline SVG
 in [VitePress](https://vitepress.dev/) — **at build time**, with no client-side
-JavaScript — powered by the pure-TypeScript [`graphviz-ts`](https://www.npmjs.com/package/graphviz-ts)
-engine.
+JavaScript — powered by the pure-TypeScript [`@knowvah/dot-engine`](https://www.npmjs.com/package/@knowvah/dot-engine).
 
 Unlike client-rendered diagram plugins (e.g. mermaid, which ships a WASM/JS
-runtime and renders in the browser on mount), `graphviz-ts` is **synchronous and
+runtime and renders in the browser on mount), `@knowvah/dot-engine` is **synchronous and
 runs in Node**, so this plugin renders each diagram during `vitepress build` and
 embeds static `<svg>` directly in the HTML:
 
@@ -26,10 +25,10 @@ digraph {
 ## Install
 
 ```bash
-npm i -D @knowvah/vitepress-plugin-dot graphviz-ts
+npm i -D @knowvah/vitepress-plugin-dot @knowvah/dot-engine
 ```
 
-`graphviz-ts` is a peer dependency — you install the engine version you want.
+`@knowvah/dot-engine` is a peer dependency — you install the engine version you want.
 
 ## Usage
 
@@ -103,7 +102,7 @@ export default {
 ```
 
 Trade-offs: build mode ships zero JS and renders instantly; client mode ships the
-graphviz-ts engine to the browser (lazy-loaded on first diagram) and shows a brief
+@knowvah/dot-engine to the browser (lazy-loaded on first diagram) and shows a brief
 mount delay, but keeps a pathological graph off your build and re-renders nothing
 on navigation. Both honor `useCurrentColor` for dark mode.
 
@@ -140,7 +139,7 @@ export default withDot(
 );
 ```
 
-A ready-made DOT grammar is in the graphviz-ts docs
+A ready-made DOT grammar is in the @knowvah/dot-engine docs
 (`docs-site/.vitepress/dot.tmLanguage.ts`), or use any community
 `source.dot` TextMate grammar.
 
@@ -189,7 +188,7 @@ to hang the build) is aborted to an error panel instead of stalling `vitepress
 build`. For trusted author content (the common docs case), the default in-process
 render is fast and safe.
 
-> **Note for the `graphviz-ts` docs site:** it intentionally keeps a documented
+> **Note for the `@knowvah/dot-engine` docs site:** it intentionally keeps a documented
 > infinite-loop DOT example as *highlighted source*. There, set
 > `renderLanguage: 'graphviz'` (or mark such blocks ` ```dot no-render `) so they
 > are not rendered.
@@ -197,10 +196,16 @@ render is fast and safe.
 ## How it works
 
 A markdown-it `fence` rule matches the configured language, calls
-`tryRenderSvg(code, engine)` from `graphviz-ts`, strips the standalone-document
+`tryRenderSvg(code, engine)` from `@knowvah/dot-engine`, strips the standalone-document
 prolog/DOCTYPE, and emits the inline `<svg>` in a wrapper `<div>`. Non-matching
 fences (and `no-render` blocks) fall through to VitePress's normal Shiki
 highlighting, untouched.
+
+## Stability
+
+As of **1.0**, this package follows [semantic versioning](https://semver.org/):
+the documented public API is stable, and breaking changes will bump the major
+version.
 
 ## License
 

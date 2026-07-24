@@ -5,7 +5,7 @@
  * `render-service.ts`), so this stays trivially unit-testable.
  */
 import { escapeHtml, normalizeEngine } from '@knowvah/dot-core';
-import type { BuiltinEngine } from 'graphviz-ts';
+import type { BuiltinEngine } from '@knowvah/dot-engine';
 
 /** A rendered preview: either inline SVG, or a human-readable error message. */
 export interface PreviewResult {
@@ -13,7 +13,7 @@ export interface PreviewResult {
   error?: string;
 }
 
-/** The built-in layout engines (graphviz-ts throws on any other name, so a name
+/** The built-in layout engines (@knowvah/dot-engine throws on any other name, so a name
  * from a comment or setting must be validated against this set before use). */
 export const BUILTIN_ENGINES: readonly BuiltinEngine[] = [
   'dot',

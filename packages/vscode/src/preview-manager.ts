@@ -7,7 +7,7 @@
  * wires to commands and events.
  */
 import * as path from 'node:path';
-import type { BuiltinEngine } from 'graphviz-ts';
+import type { BuiltinEngine } from '@knowvah/dot-engine';
 import * as vscode from 'vscode';
 import { normalizeEngine } from '@knowvah/dot-core';
 import {

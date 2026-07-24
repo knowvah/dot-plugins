@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "separate-pull-requests": false,
+  "bootstrap-sha": "c797377598eeee8ce6dbcb653c5316c945662ed8",
+  "packages": {
+    "packages/core": { "release-as": "1.0.0" },
+    "packages/markdown-it": { "release-as": "1.0.0" },
+    "packages/vitepress": { "release-as": "1.0.0" },
+    "packages/eleventy": { "release-as": "1.0.0" },
+    "packages/docusaurus": { "release-as": "1.0.0" },
+    "packages/react": { "release-as": "1.0.0" }
+  }
+}

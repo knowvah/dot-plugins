@@ -10,9 +10,9 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  // graphviz-ts is a peer (the consumer installs it); node builtins stay external.
+  // @knowvah/dot-engine is a peer (the consumer installs it); node builtins stay external.
   external: [
-    'graphviz-ts',
+    '@knowvah/dot-engine',
     'node:child_process',
     'node:module',
     'node:url',

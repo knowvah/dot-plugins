@@ -8,5 +8,5 @@ export default defineConfig({
   dts: true,
   clean: true,
   treeshake: true,
-  external: ['@knowvah/dot-core', 'graphviz-ts', 'markdown-it'],
+  external: ['@knowvah/dot-core', '@knowvah/dot-engine', 'markdown-it'],
 });

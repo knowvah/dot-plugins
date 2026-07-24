@@ -1,6 +1,6 @@
 {
   "information_for_contributors": [
-    "This grammar (scope source.dot) is licensed EPL-2.0 — it is reused verbatim from graphviz-ts, and retains that project's license rather than the MIT license of the rest of this extension. See the extension README's Licensing section."
+    "This grammar (scope source.dot) is licensed EPL-2.0 — it is reused verbatim from @knowvah/dot-engine, and retains that project's license rather than the MIT license of the rest of this extension. See the extension README's Licensing section."
   ],
   "name": "dot",
   "scopeName": "source.dot",
