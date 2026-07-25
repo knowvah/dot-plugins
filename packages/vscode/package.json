@@ -6,6 +6,11 @@
   "private": true,
   "license": "MIT",
   "publisher": "knowvah",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#0D0D1A",
+    "theme": "dark"
+  },
   "categories": [
     "Programming Languages",
     "Visualization"
