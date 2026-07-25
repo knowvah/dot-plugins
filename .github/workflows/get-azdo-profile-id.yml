@@ -1,0 +1,58 @@
+name: Get Azure DevOps profile ID (throwaway)
+
+# TEMPORARY bootstrap helper — DELETE once you have the ID.
+#
+# Authenticates as the Marketplace managed identity via GitHub OIDC and calls
+# the Azure DevOps Profile API to print the identity's Team Foundation "profile
+# ID". That profile ID is what you add as a member of the `knowvah` Marketplace
+# publisher (role: Contributor) — the member search does not recognize the
+# client/tenant/object/resource IDs.
+#
+# Read-only: it never packages or publishes anything.
+#
+# Requires (same as the publish workflow):
+#   - `vscode-marketplace` environment with AZURE_CLIENT_ID + AZURE_TENANT_ID
+#   - the identity's federated credential trusting subject
+#     repo:knowvah@285210225/dot-plugins@1310197227:environment:vscode-marketplace
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write # OIDC → Entra token (no stored secret)
+
+jobs:
+  profile-id:
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace # must match the federated-credential subject
+    steps:
+      - name: Azure login (Entra ID via OIDC)
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Fetch Team Foundation profile ID
+        run: |
+          set -euo pipefail
+          # Constant Azure DevOps application ID (the resource to request a token for).
+          AZDO_RESOURCE="499b84ac-1321-427f-aa17-267ca6975798"
+          echo "Requesting an Azure DevOps token as the managed identity..."
+          token="$(az account get-access-token --resource "$AZDO_RESOURCE" --query accessToken -o tsv)"
+          echo "Calling the Azure DevOps Profile API..."
+          resp="$(curl -fsS -H "Authorization: Bearer $token" \
+            'https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1')" \
+            || { echo "::error::Profile API call failed — the identity may not be recognized by Azure DevOps yet, or the token scope is wrong."; exit 1; }
+          echo "--- raw profile response ---"
+          echo "$resp"
+          echo "----------------------------"
+          id="$(echo "$resp" | jq -r '.id // empty')"
+          if [ -z "$id" ]; then
+            echo "::error::No 'id' field in the response (see raw output above)."
+            exit 1
+          fi
+          echo "::notice title=Azure DevOps profile ID::$id"
+          echo ""
+          echo "Add this ID as a member of the 'knowvah' publisher with role Contributor:"
+          echo "  $id"
