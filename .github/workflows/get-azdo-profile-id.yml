@@ -2,18 +2,16 @@ name: Get Azure DevOps profile ID (throwaway)
 
 # TEMPORARY bootstrap helper — DELETE once you have the ID.
 #
-# Authenticates as the Marketplace managed identity via GitHub OIDC and calls
-# the Azure DevOps Profile API to print the identity's Team Foundation "profile
-# ID". That profile ID is what you add as a member of the `knowvah` Marketplace
-# publisher (role: Contributor) — the member search does not recognize the
-# client/tenant/object/resource IDs.
+# Authenticates as the Marketplace managed identity via GitHub OIDC and probes
+# Azure DevOps for the identity's Team Foundation ID — the value you add as a
+# member of the `knowvah` publisher (role: Contributor). The member search does
+# not accept the client/tenant/object/resource IDs.
 #
 # Read-only: it never packages or publishes anything.
 #
-# Requires (same as the publish workflow):
-#   - `vscode-marketplace` environment with AZURE_CLIENT_ID + AZURE_TENANT_ID
-#   - the identity's federated credential trusting subject
-#     repo:knowvah@285210225/dot-plugins@1310197227:environment:vscode-marketplace
+# Requires: the `vscode-marketplace` environment with AZURE_CLIENT_ID +
+# AZURE_TENANT_ID, and the identity's federated credential trusting subject
+# repo:knowvah@285210225/dot-plugins@1310197227:environment:vscode-marketplace
 on:
   workflow_dispatch: {}
 
@@ -33,26 +31,38 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           allow-no-subscriptions: true
 
-      - name: Fetch Team Foundation profile ID
+      - name: Probe Azure DevOps identity endpoints
         run: |
-          set -euo pipefail
-          # Constant Azure DevOps application ID (the resource to request a token for).
+          set -uo pipefail  # not -e: run every probe even if one fails
           AZDO_RESOURCE="499b84ac-1321-427f-aa17-267ca6975798"
           echo "Requesting an Azure DevOps token as the managed identity..."
           token="$(az account get-access-token --resource "$AZDO_RESOURCE" --query accessToken -o tsv)"
-          echo "Calling the Azure DevOps Profile API..."
-          resp="$(curl -fsS -H "Authorization: Bearer $token" \
-            'https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1')" \
-            || { echo "::error::Profile API call failed — the identity may not be recognized by Azure DevOps yet, or the token scope is wrong."; exit 1; }
-          echo "--- raw profile response ---"
-          echo "$resp"
-          echo "----------------------------"
-          id="$(echo "$resp" | jq -r '.id // empty')"
-          if [ -z "$id" ]; then
-            echo "::error::No 'id' field in the response (see raw output above)."
-            exit 1
-          fi
-          echo "::notice title=Azure DevOps profile ID::$id"
-          echo ""
-          echo "Add this ID as a member of the 'knowvah' publisher with role Contributor:"
-          echo "  $id"
+
+          probe() {
+            echo "=================================================="
+            echo "GET $1"
+            code="$(curl -sS -o /tmp/body -w '%{http_code}' \
+              -H "Authorization: Bearer $token" \
+              -H 'Accept: application/json' "$1" || echo 000)"
+            echo "HTTP $code"
+            if command -v jq >/dev/null && jq . /tmp/body >/dev/null 2>&1; then
+              jq . /tmp/body
+            else
+              cat /tmp/body 2>/dev/null || true; echo
+            fi
+            echo
+          }
+
+          # connectionData is the canonical "who am I" — works for service
+          # principals / managed identities. authenticatedUser.id is the Team
+          # Foundation ID; .subjectDescriptor is the modern descriptor. One of
+          # these is what the publisher Members search accepts.
+          probe 'https://app.vssps.visualstudio.com/_apis/connectionData'
+
+          # profile/me is user-centric and typically 404s for an SP/MI — kept
+          # only as a comparison data point.
+          probe 'https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=7.1'
+
+          echo "==> From the connectionData block above, note authenticatedUser.id"
+          echo "    (and .subjectDescriptor). That is the value to add as a"
+          echo "    Contributor member of the 'knowvah' publisher."
