@@ -12,6 +12,11 @@ name: Release
 on:
   push:
     branches: [main]
+  # Manual trigger: lets a maintainer re-run release-please if a push run fails
+  # to start (transient Actions startup_failure) or to refresh the release PR.
+  # Safe — the publish steps run only when a release PR was merged
+  # (releases_created), so a bare dispatch just opens/updates the release PR.
+  workflow_dispatch: {}
 
 concurrency: release-${{ github.ref }}
 
