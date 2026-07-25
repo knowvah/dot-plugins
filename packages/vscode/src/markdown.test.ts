@@ -2,8 +2,16 @@ import { describe, it, expect } from 'vitest';
 import MarkdownIt from 'markdown-it';
 import { extendMarkdownIt } from './markdown.js';
 
-function render(src: string): string {
-  return extendMarkdownIt(new MarkdownIt({ html: true })).render(src);
+function render(
+  src: string,
+  useCurrentColor = false,
+  defaultEngine = 'dot',
+): string {
+  return extendMarkdownIt(
+    new MarkdownIt({ html: true }),
+    () => defaultEngine,
+    () => useCurrentColor,
+  ).render(src);
 }
 
 describe('extendMarkdownIt — VS Code Markdown preview', () => {
@@ -35,5 +43,33 @@ describe('extendMarkdownIt — VS Code Markdown preview', () => {
     // neato lays out `graph { a -- b }`; just assert it renders to SVG.
     const html = render('```dot engine=neato\ngraph { a -- b }\n```\n');
     expect(html).toContain('<svg');
+  });
+
+  it('renders native black by default (no currentColor remap)', () => {
+    const html = render('```dot\ndigraph { a -> b }\n```\n');
+    expect(html).toContain('<svg');
+    expect(html).not.toContain('currentColor');
+  });
+
+  it('remaps black to currentColor when useCurrentColor is enabled', () => {
+    const html = render('```dot\ndigraph { a -> b }\n```\n', true);
+    expect(html).toContain('currentColor');
+  });
+
+  it('reads the engine + color resolvers per render (live settings)', () => {
+    let engine = 'dot';
+    let useCurrentColor = false;
+    const md = extendMarkdownIt(
+      new MarkdownIt({ html: true }),
+      () => engine,
+      () => useCurrentColor,
+    );
+    const first = md.render('```dot\ndigraph { a -> b }\n```\n');
+    expect(first).not.toContain('currentColor');
+    // Change the "settings" without rebuilding the cached markdown-it instance.
+    engine = 'neato';
+    useCurrentColor = true;
+    const second = md.render('```dot\ndigraph { a -> b }\n```\n');
+    expect(second).toContain('currentColor'); // picked up on the next render
   });
 });

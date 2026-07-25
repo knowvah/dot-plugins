@@ -98,12 +98,22 @@ dropped (latest edit wins).
 
 - **`dot.preview.defaultEngine`** (default `dot`) — the layout engine used when
   a file has no remembered selection and no `// engine:` directive; also the
-  default for Markdown-preview ` ```dot ` blocks. See *Choosing a layout engine*.
+  default for Markdown-preview ` ```dot ` blocks (a per-block ` engine=… ` still
+  wins). Read per render in both previews, so a change is observed on the next
+  render — no reload. See *Choosing a layout engine*.
 - **`dot.preview.renderTimeoutSeconds`** (default `60`, min `1`) — how long the
   file preview waits for a render before aborting to a timeout message. Because
   rendering is off the main thread, this never freezes the editor; raise it for
   very large graphs, lower it if you want a runaway graph reported sooner. The
   value is read per render, so changes take effect immediately (no reload).
+- **`dot.preview.useCurrentColor`** (default `false`) — when on, the diagram's
+  black strokes and text are remapped to the editor's foreground color so the
+  diagram follows your theme. Off by default because Graphviz paints a white
+  diagram background, so native black stays legible in any theme; with it on, a
+  dark theme's near-white foreground would nearly vanish on that white canvas.
+  Enable it only if you also make the graph background transparent (e.g.
+  `bgcolor="transparent"`). Read per render in both previews, so a change is
+  observed on the next render — no reload.
 
 ## Known limitations (v1)
 

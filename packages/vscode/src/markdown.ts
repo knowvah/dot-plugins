@@ -18,12 +18,28 @@ import { renderDotHtml } from '@knowvah/dot-core';
 const renderInline: ClientEmitter = (dot, engine, cfg) =>
   renderDotHtml(dot, engine, cfg);
 
-/** VS Code's `extendMarkdownIt` contribution: install the DOT fence renderer.
- * `defaultEngine` is the engine for blocks without an ` engine=… ` directive. */
-export function extendMarkdownIt(md: MarkdownIt, defaultEngine = 'dot'): MarkdownIt {
+/**
+ * VS Code's `extendMarkdownIt` contribution: install the DOT fence renderer.
+ *
+ * VS Code caches the Markdown preview's markdown-it instance and rebuilds it
+ * only on window reload, so it calls this once. The settings are therefore
+ * passed as *resolvers* the fence rule calls per render (not captured values),
+ * so a changed `dot.preview.defaultEngine` / `dot.preview.useCurrentColor` is
+ * observed on the next preview render — no reload needed.
+ *
+ * `resolveDefaultEngine` supplies the engine for blocks without an ` engine=… `
+ * directive; `resolveUseCurrentColor` toggles the theme-aware black→currentColor
+ * remap (off by default so diagrams render native black on Graphviz's white
+ * canvas). Defaults keep the function usable in plain unit tests.
+ */
+export function extendMarkdownIt(
+  md: MarkdownIt,
+  resolveDefaultEngine: () => string = () => 'dot',
+  resolveUseCurrentColor: () => boolean = () => false,
+): MarkdownIt {
   return md.use(dotMarkdown, {
-    useCurrentColor: true,
-    defaultEngine,
+    resolveDefaultEngine,
+    resolveUseCurrentColor,
     emitClient: renderInline,
   });
 }

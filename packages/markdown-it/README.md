@@ -40,7 +40,7 @@ md.render('```dot\ndigraph { a -> b }\n```'); // -> <div class="dot-diagram"><sv
 
 | Export | |
 | --- | --- |
-| `dotMarkdown(md, options?)` | Install the fence renderer. `options` is `DotMarkdownOptions` (all of `@knowvah/dot-core`'s `DotPluginOptions` plus `emitClient`). |
+| `dotMarkdown(md, options?)` | Install the fence renderer. `options` is `DotMarkdownOptions` (all of `@knowvah/dot-core`'s `DotPluginOptions` plus `emitClient`, and the lazy `resolveDefaultEngine` / `resolveUseCurrentColor` getters — read per render, for hosts that cache the markdown-it instance and need to observe changed settings without rebuilding it). |
 | `emitDotDiagramElement(dot, engine, cfg)` | The default `<dot-diagram>` client emitter. |
 | `parseFenceInfo` | Re-exported from `@knowvah/dot-core`. |
 

@@ -91,3 +91,54 @@ describe('emitDotDiagramElement', () => {
     );
   });
 });
+
+describe('dotMarkdown — live resolvers', () => {
+  const BLOCK = '```dot\ndigraph { a -> b }\n```\n';
+
+  it('reads resolveDefaultEngine per render (not captured at install)', () => {
+    let engine = 'dot';
+    const calls: string[] = [];
+    const md = new MarkdownIt();
+    dotMarkdown(md, {
+      resolveDefaultEngine: () => {
+        calls.push(engine);
+        return engine;
+      },
+    });
+    md.render(BLOCK);
+    engine = 'neato';
+    md.render(BLOCK);
+    expect(calls).toEqual(['dot', 'neato']); // read fresh each render
+  });
+
+  it('lets a per-block engine= win over the resolver', () => {
+    let called = false;
+    const md = new MarkdownIt();
+    dotMarkdown(md, {
+      resolveDefaultEngine: () => {
+        called = true;
+        return 'neato';
+      },
+    });
+    md.render('```dot engine=circo\ngraph { a -- b }\n```\n');
+    expect(called).toBe(false); // `??` short-circuits when the block sets one
+  });
+
+  it('falls back to the static default when the resolver returns undefined', () => {
+    const md = new MarkdownIt();
+    dotMarkdown(md, {
+      defaultEngine: 'neato',
+      resolveDefaultEngine: () => undefined,
+    });
+    expect(md.render(BLOCK)).toContain('<svg'); // renders via the static default
+  });
+
+  it('reads resolveUseCurrentColor per render', () => {
+    let useCurrentColor = false;
+    const md = new MarkdownIt();
+    dotMarkdown(md, { resolveUseCurrentColor: () => useCurrentColor });
+    expect(md.render(BLOCK)).not.toContain('currentColor');
+    useCurrentColor = true;
+    expect(md.render(BLOCK)).toContain('currentColor');
+  });
+});
