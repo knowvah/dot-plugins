@@ -99,4 +99,11 @@ jobs:
         working-directory: packages/vscode
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
-        run: pnpm exec ovsx publish "${{ steps.pack.outputs.vsix }}"
+        run: |
+          set -euo pipefail
+          # ovsx won't auto-create the namespace. Create it once; on later runs
+          # it already exists, so tolerate that specific outcome (the publish
+          # step below still fails loudly on a real auth/permission problem).
+          pnpm exec ovsx create-namespace knowvah || \
+            echo "create-namespace non-zero (already exists?) — continuing to publish"
+          pnpm exec ovsx publish "${{ steps.pack.outputs.vsix }}"
