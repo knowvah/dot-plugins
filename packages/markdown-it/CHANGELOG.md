@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v1.0.0...dot-markdown-it-v1.1.0) (2026-07-25)
+
+
+### Features
+
+* **markdown-it:** add lazy resolveDefaultEngine/resolveUseCurrentColor ([df022df](https://github.com/knowvah/dot-plugins/commit/df022dfcfa49b565d0e648ffacb52efbdf30487c))
+
+
+### Bug Fixes
+
+* **vscode:** native-black preview + live-configurable engine/color ([3f3b3d4](https://github.com/knowvah/dot-plugins/commit/3f3b3d4fc10742bcaa4140283c3d5c386d758ae3))
+
 ## [1.0.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v0.1.0...dot-markdown-it-v1.0.0) (2026-07-24)
 
 
