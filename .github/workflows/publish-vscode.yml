@@ -1,17 +1,27 @@
 name: Publish VS Code Extension
 
 # Publishes the `dot-vscode` extension to the VS Code Marketplace (vsce) and
-# Open VSX (ovsx). Unlike the npm packages (release.yml, OIDC trusted
-# publishing), these registries do NOT support OIDC, so this uses tokens:
-#   - VSCE_PAT  Azure DevOps PAT for the `knowvah` Marketplace publisher
-#               (scope: Marketplace > Manage)
-#   - OVSX_PAT  Open VSX access token for the `knowvah` namespace
-# Store both as secrets on the `vscode-marketplace` environment.
+# Open VSX (ovsx). It packages the vsix once and pushes the same artifact to
+# both registries.
 #
-# dot-vscode is versioned MANUALLY (release-please excludes it). The version
-# published is packages/vscode/package.json's `version`. To release: bump that,
-# merge, then either run this workflow (Actions > Run workflow) or push a tag
-# `dot-vscode-v<version>`. Re-publishing an already-published version fails.
+# Auth model (deliberately NOT a global Azure DevOps PAT — those retire on
+# 2026-12-01, and the Marketplace requires exactly that global scope):
+#   - VS Code Marketplace: Microsoft Entra ID via GitHub OIDC. `azure/login`
+#     exchanges the workflow's OIDC token for an Entra token (no stored secret);
+#     `vsce publish --azure-credential` uses it. REQUIRES the `knowvah` publisher
+#     to be owned by an Entra ORG tenant (the OIDC/service-principal flow does
+#     not work for a personally-owned publisher — microsoft/vscode-vsce#1023).
+#   - Open VSX: a plain access token (OVSX_PAT) — unaffected by the PAT retirement.
+#
+# Setup (on the `vscode-marketplace` environment):
+#   - Entra app registration with a FEDERATED CREDENTIAL trusting this repo's
+#     `vscode-marketplace` environment; its service principal added as a member
+#     of the `knowvah` Marketplace publisher.
+#   - Secrets/vars: AZURE_CLIENT_ID, AZURE_TENANT_ID (the app), OVSX_PAT.
+#
+# dot-vscode is versioned MANUALLY (release-please excludes it); this publishes
+# packages/vscode/package.json's `version`. Trigger via Run workflow or a
+# `dot-vscode-v<version>` tag (a tag must match that version).
 on:
   workflow_dispatch: {}
   push:
@@ -22,6 +32,7 @@ concurrency: publish-vscode-${{ github.ref }}
 
 permissions:
   contents: read
+  id-token: write # OIDC → Entra token for the Marketplace (no stored PAT)
 
 jobs:
   publish:
@@ -71,11 +82,18 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to VS Code Marketplace
+      # OIDC → Entra token. No stored secret; the app is trusted via a federated
+      # credential on the `vscode-marketplace` environment.
+      - name: Azure login (Entra ID via OIDC)
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Publish to VS Code Marketplace (Entra ID)
         working-directory: packages/vscode
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: pnpm exec vsce publish --packagePath "${{ steps.pack.outputs.vsix }}"
+        run: pnpm exec vsce publish --azure-credential --packagePath "${{ steps.pack.outputs.vsix }}"
 
       - name: Publish to Open VSX
         working-directory: packages/vscode
