@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Fix a Marketplace publish failure caused by an invalid tag: the `@knowvah/dot-engine`
+  keyword (a leftover from an engine rename) can't be a Marketplace tag because
+  tags may not start with `@`. Replaced it with `svg`. No functional change.
+
 ## 1.0.0
 
 First stable release.
