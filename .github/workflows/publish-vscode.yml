@@ -1,0 +1,102 @@
+name: Publish VS Code Extension
+
+# Publishes the `dot-vscode` extension to the VS Code Marketplace (vsce) and
+# Open VSX (ovsx). It packages the vsix once and pushes the same artifact to
+# both registries.
+#
+# Auth model (deliberately NOT a global Azure DevOps PAT — those retire on
+# 2026-12-01, and the Marketplace requires exactly that global scope):
+#   - VS Code Marketplace: Microsoft Entra ID via GitHub OIDC. `azure/login`
+#     exchanges the workflow's OIDC token for an Entra token (no stored secret);
+#     `vsce publish --azure-credential` uses it. REQUIRES the `knowvah` publisher
+#     to be owned by an Entra ORG tenant (the OIDC/service-principal flow does
+#     not work for a personally-owned publisher — microsoft/vscode-vsce#1023).
+#   - Open VSX: a plain access token (OVSX_PAT) — unaffected by the PAT retirement.
+#
+# Setup (on the `vscode-marketplace` environment):
+#   - Entra app registration with a FEDERATED CREDENTIAL trusting this repo's
+#     `vscode-marketplace` environment; its service principal added as a member
+#     of the `knowvah` Marketplace publisher.
+#   - Secrets/vars: AZURE_CLIENT_ID, AZURE_TENANT_ID (the app), OVSX_PAT.
+#
+# dot-vscode is versioned MANUALLY (release-please excludes it); this publishes
+# packages/vscode/package.json's `version`. Trigger via Run workflow or a
+# `dot-vscode-v<version>` tag (a tag must match that version).
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - 'dot-vscode-v*'
+
+concurrency: publish-vscode-${{ github.ref }}
+
+permissions:
+  contents: read
+  id-token: write # OIDC → Entra token for the Marketplace (no stored PAT)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: vscode-marketplace
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          version: 10
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Build every package: the extension's esbuild bundle resolves
+      # @knowvah/dot-core and @knowvah/dot-markdown-it via their dist/ output.
+      - run: pnpm -r build
+
+      # Package the vsix once, then publish the SAME artifact to both registries.
+      - name: Package vsix
+        id: pack
+        working-directory: packages/vscode
+        run: |
+          set -euo pipefail
+          pnpm package
+          version="$(node -p "require('./package.json').version")"
+          vsix="dot-vscode-${version}.vsix"
+          test -f "$vsix"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "vsix=$vsix" >> "$GITHUB_OUTPUT"
+          echo "Packaged dot-vscode $version -> $vsix"
+
+      # For a tag trigger, refuse to publish if the tag and the packaged version
+      # disagree (guards against a stale tag).
+      - name: Verify tag matches version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          set -euo pipefail
+          expected="dot-vscode-v${{ steps.pack.outputs.version }}"
+          if [ "${{ github.ref_name }}" != "$expected" ]; then
+            echo "::error::Tag ${{ github.ref_name }} does not match packaged version ($expected)"
+            exit 1
+          fi
+
+      # OIDC → Entra token. No stored secret; the app is trusted via a federated
+      # credential on the `vscode-marketplace` environment.
+      - name: Azure login (Entra ID via OIDC)
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Publish to VS Code Marketplace (Entra ID)
+        working-directory: packages/vscode
+        run: pnpm exec vsce publish --azure-credential --packagePath "${{ steps.pack.outputs.vsix }}"
+
+      - name: Publish to Open VSX
+        working-directory: packages/vscode
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: pnpm exec ovsx publish "${{ steps.pack.outputs.vsix }}"
