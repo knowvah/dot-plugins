@@ -93,17 +93,33 @@ jobs:
 
       - name: Publish to VS Code Marketplace (Entra ID)
         working-directory: packages/vscode
-        run: pnpm exec vsce publish --azure-credential --packagePath "${{ steps.pack.outputs.vsix }}"
+        run: |
+          set -uo pipefail
+          # Idempotent: if this exact version is already on the Marketplace
+          # (e.g. a re-run after a later step failed), skip instead of failing.
+          out="$(pnpm exec vsce publish --azure-credential --packagePath "${{ steps.pack.outputs.vsix }}" 2>&1)" && rc=0 || rc=$?
+          echo "$out"
+          if [ "$rc" -ne 0 ]; then
+            echo "$out" | grep -qiE "already exists|already published" \
+              && echo "Marketplace: this version is already published — skipping." \
+              || exit "$rc"
+          fi
 
       - name: Publish to Open VSX
         working-directory: packages/vscode
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          set -euo pipefail
-          # ovsx won't auto-create the namespace. Create it once; on later runs
-          # it already exists, so tolerate that specific outcome (the publish
-          # step below still fails loudly on a real auth/permission problem).
+          set -uo pipefail
+          # ovsx won't auto-create the namespace. Create it once; tolerate the
+          # already-exists case on later runs.
           pnpm exec ovsx create-namespace knowvah || \
             echo "create-namespace non-zero (already exists?) — continuing to publish"
-          pnpm exec ovsx publish "${{ steps.pack.outputs.vsix }}"
+          # Idempotent publish, same as the Marketplace step above.
+          out="$(pnpm exec ovsx publish "${{ steps.pack.outputs.vsix }}" 2>&1)" && rc=0 || rc=$?
+          echo "$out"
+          if [ "$rc" -ne 0 ]; then
+            echo "$out" | grep -qiE "already exists|already published" \
+              && echo "Open VSX: this version is already published — skipping." \
+              || exit "$rc"
+          fi
