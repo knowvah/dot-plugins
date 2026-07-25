@@ -8,3 +8,12 @@ esbuild.config.mjs
 **/*.map
 .gitignore
 vitest.config.*
+
+# Session / tooling artifacts — never ship these to the Marketplace.
+.agent-notes/**
+.serena/**
+.mcp.json
+.claude/**
+.idea/**
+**/.DS_Store
+media/icon.svg
