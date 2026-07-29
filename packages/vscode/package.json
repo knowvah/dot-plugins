@@ -155,16 +155,16 @@
   },
   "devDependencies": {
     "@knowvah/dot-core": "workspace:*",
+    "@knowvah/dot-engine": "^1.2.5",
     "@knowvah/dot-markdown-it": "workspace:*",
-    "@types/markdown-it": "^14.0.0",
-    "@types/node": "^22.0.0",
-    "@types/vscode": "^1.85.0",
-    "@vscode/vsce": "^3.0.0",
-    "esbuild": "^0.24.0",
-    "@knowvah/dot-engine": "^1.0.0",
-    "markdown-it": "^14.0.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.20.1",
+    "@types/vscode": "^1.125.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.24.2",
+    "markdown-it": "^14.3.0",
     "ovsx": "^1.0.2",
     "typescript": "^6.0.3",
-    "vitest": "^3.0.0"
+    "vitest": "^3.2.7"
   }
 }
