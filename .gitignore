@@ -7,6 +7,11 @@ dist
 *.log
 .DS_Store
 
+# pnpm is the only package manager here; pnpm-lock.yaml is the sole lockfile.
+# A stray package-lock.json shadows it and breaks `pnpm install --frozen-lockfile`
+# expectations for anyone who reaches for npm by habit.
+package-lock.json
+
 # tooling / session artifacts
 .serena/
 .mcp.json
