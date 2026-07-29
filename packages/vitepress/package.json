@@ -53,7 +53,7 @@
     "@knowvah/dot-markdown-it": "workspace:*"
   },
   "peerDependencies": {
-    "@knowvah/dot-engine": ">=1.0.0",
+    "@knowvah/dot-engine": ">=1.2.5",
     "vitepress": "^1.0.0",
     "vue": "^3.4.0"
   },
@@ -66,15 +66,15 @@
     }
   },
   "devDependencies": {
+    "@knowvah/dot-engine": "^1.2.5",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^22.0.0",
-    "@knowvah/dot-engine": "^1.0.0",
-    "markdown-it": "^14.1.0",
-    "tsup": "^8.5.0",
+    "@types/node": "^22.20.1",
+    "markdown-it": "^14.3.0",
+    "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vitepress": "^1.6.4",
-    "vitest": "^3.0.0",
-    "vue": "^3.5.0"
+    "vitest": "^3.2.7",
+    "vue": "^3.5.40"
   },
   "publishConfig": {
     "access": "public"
