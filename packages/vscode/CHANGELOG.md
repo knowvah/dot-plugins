@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+
+- **Raised the minimum supported VS Code version to 1.125.0** (was 1.85.0).
+  Existing installs on older VS Code builds keep working, but they will no
+  longer receive updates — upgrade VS Code to continue getting them. There is
+  no functional change to the extension itself in this release; the bump aligns
+  the declared engine with the `@types/vscode` version the extension builds
+  against, and narrows the range of VS Code builds this extension is tested on.
+
 ## 1.0.1
 
 - Fix a Marketplace publish failure caused by an invalid tag: the `@knowvah/dot-engine`
