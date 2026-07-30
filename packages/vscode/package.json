@@ -2,7 +2,7 @@
   "name": "dot-vscode",
   "displayName": "DOT (Graphviz) Preview & Syntax",
   "description": "Syntax highlighting and live SVG preview for Graphviz DOT (.dot / .gv) files — powered by the pure-TypeScript @knowvah/dot-engine.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "license": "MIT",
   "publisher": "knowvah",
@@ -30,7 +30,7 @@
     "directory": "packages/vscode"
   },
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.125.0"
   },
   "main": "./dist/extension.js",
   "contributes": {
