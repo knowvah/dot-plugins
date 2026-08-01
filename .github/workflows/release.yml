@@ -40,10 +40,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # The steps below run only when a release PR was merged (releases cut).
+      # No `version:` here on purpose. package.json's `packageManager` field is
+      # the single source of truth for the pnpm version; action-setup reads it
+      # and hard-errors if a version is also specified here.
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         if: ${{ steps.release.outputs.releases_created == 'true' }}
-        with:
-          version: 10
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         if: ${{ steps.release.outputs.releases_created == 'true' }}
