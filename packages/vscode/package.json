@@ -155,7 +155,7 @@
   },
   "devDependencies": {
     "@knowvah/dot-core": "workspace:*",
-    "@knowvah/dot-engine": "^1.2.5",
+    "@knowvah/dot-engine": "^1.2.6",
     "@knowvah/dot-markdown-it": "workspace:*",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.20.1",
