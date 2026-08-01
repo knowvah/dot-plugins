@@ -41,9 +41,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # No `version:` here on purpose. package.json's `packageManager` field is
+      # the single source of truth for the pnpm version; action-setup reads it
+      # and hard-errors if a version is also specified here.
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
-        with:
-          version: 10
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
