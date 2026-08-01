@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Render Graphviz DOT diagrams in static-site generators (VitePress, Eleventy, Docusaurus) — powered by the pure-TypeScript @knowvah/dot-engine.",
   "license": "MIT",
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
