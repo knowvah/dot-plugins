@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v1.0.0...vitepress-plugin-dot-v2.0.0) (2026-08-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* consumers on Node 18 or 20 will now see an engine warning on install, and a failure under engine-strict.
+
+### Miscellaneous Chores
+
+* raise node engines floor to 22, pin pnpm at 10.34.5 ([#21](https://github.com/knowvah/dot-plugins/issues/21)) ([0963ee1](https://github.com/knowvah/dot-plugins/commit/0963ee103ec7624f0ca1d48e9c5f3a5db66acc09))
+
 ## [1.0.0](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v0.1.0...vitepress-plugin-dot-v1.0.0) (2026-07-24)
 
 

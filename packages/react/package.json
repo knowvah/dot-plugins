@@ -1,6 +1,6 @@
 {
   "name": "@knowvah/dot-react",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A React <DotDiagram> component that renders Graphviz DOT to SVG in the browser — powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",
