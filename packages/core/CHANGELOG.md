@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/knowvah/dot-plugins/compare/dot-core-v1.0.0...dot-core-v1.1.0) (2026-08-01)
+
+
+### Features
+
+* raise the node engines floor to 22 across published packages ([300e046](https://github.com/knowvah/dot-plugins/commit/300e04638eb72ab3202590a20d224b766b71d0dd))
+
 ## [1.0.0](https://github.com/knowvah/dot-plugins/compare/dot-core-v0.1.0...dot-core-v1.0.0) (2026-07-24)
 
 
