@@ -19,5 +19,7 @@ package-lock.json
 .claude/
 plans/
 .idea/
+.plan-mission-progress.md
+.upgrade-deps-progress.md
 
 .serena/cache/
