@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v1.1.0...dot-markdown-it-v1.2.0) (2026-08-01)
+
+
+### Features
+
+* raise the node engines floor to 22 across published packages ([300e046](https://github.com/knowvah/dot-plugins/commit/300e04638eb72ab3202590a20d224b766b71d0dd))
+
 ## [1.1.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v1.0.0...dot-markdown-it-v1.1.0) (2026-07-25)
 
 

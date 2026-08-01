@@ -1,6 +1,6 @@
 {
   "name": "@knowvah/docusaurus-plugin-dot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Render Graphviz DOT fenced code blocks as diagrams in Docusaurus (MDX) — powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@knowvah/dot-markdown-it",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "markdown-it plugin: render Graphviz DOT fenced code blocks to inline SVG (build time) or a client component — shared by the VitePress and Eleventy DOT plugins. Powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",
