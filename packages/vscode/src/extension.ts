@@ -5,7 +5,7 @@
  * Markdown preview. Syntax highlighting and language association are declarative
  * (`package.json` `contributes`).
  */
-import type MarkdownIt from 'markdown-it';
+import type { MarkdownIt } from 'markdown-it';
 import * as vscode from 'vscode';
 import {
   PreviewManager,

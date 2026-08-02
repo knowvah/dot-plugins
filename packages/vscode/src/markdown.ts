@@ -8,7 +8,7 @@
  * No `vscode` dependency, so it is unit-testable with a plain markdown-it
  * instance; `extension.ts` returns `{ extendMarkdownIt }` from `activate()`.
  */
-import type MarkdownIt from 'markdown-it';
+import type { MarkdownIt } from 'markdown-it';
 import { dotMarkdown, type ClientEmitter } from '@knowvah/dot-markdown-it';
 import { renderDotHtml } from '@knowvah/dot-core';
 

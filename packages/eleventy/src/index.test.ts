@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import MarkdownIt from 'markdown-it';
+import MarkdownIt, { type MarkdownIt as MarkdownItInstance } from 'markdown-it';
 import eleventyPluginDot, { installDotFence } from './index.js';
 
 function render(
@@ -62,7 +62,7 @@ describe('eleventyPluginDot', () => {
   it('amends the markdown library with the DOT fence renderer', () => {
     const md = new MarkdownIt();
     const eleventyConfig = {
-      amendLibrary: vi.fn((name: string, cb: (m: MarkdownIt) => void) => {
+      amendLibrary: vi.fn((name: string, cb: (m: MarkdownItInstance) => void) => {
         if (name === 'md') cb(md);
       }),
     };
