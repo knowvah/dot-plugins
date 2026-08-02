@@ -45,15 +45,15 @@
     "react": ">=18"
   },
   "devDependencies": {
-    "@knowvah/dot-engine": "^1.2.5",
+    "@knowvah/dot-engine": "^1.2.6",
     "@types/node": "^22.20.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.10"
   },
   "publishConfig": {
     "access": "public"

@@ -46,12 +46,12 @@
     "@knowvah/dot-engine": ">=1.2.5"
   },
   "devDependencies": {
-    "@knowvah/dot-engine": "^1.2.5",
+    "@knowvah/dot-engine": "^1.2.6",
     "@types/node": "^22.20.1",
-    "jsdom": "^25.0.1",
+    "jsdom": "^30.0.1",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.10"
   },
   "publishConfig": {
     "access": "public"

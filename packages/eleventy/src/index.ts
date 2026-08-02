@@ -20,7 +20,7 @@
  * defineDotDiagram();
  * ```
  */
-import type MarkdownIt from 'markdown-it';
+import type { MarkdownIt } from 'markdown-it';
 import { dotMarkdown, type DotPluginOptions } from '@knowvah/dot-markdown-it';
 
 export { parseFenceInfo } from '@knowvah/dot-markdown-it';
