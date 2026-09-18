@@ -24,6 +24,7 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write # OIDC trusted publishing + provenance
+  packages: write # mirror each release to GitHub Packages (see below)
 
 jobs:
   release:
@@ -75,4 +76,40 @@ jobs:
             tgz="$(cd "$pkgdir" && pnpm pack --pack-destination "$RUNNER_TEMP" | tail -1)"
             echo "==> publishing $tgz"
             npm publish "$tgz" --provenance --access public
+          done
+
+      # Mirror the same tarballs to GitHub Packages.
+      #
+      # Why: a scope maps to ONE registry, so a consumer that needs the private
+      # @knowvah/theme (GitHub Packages) has to point @knowvah there and name
+      # every npmjs package by full tarball URL instead. pnpm 10.34.5
+      # (pnpm/pnpm#14351) drops `integrity` from URL-pinned lockfile entries,
+      # which broke CI on every Dependabot PR in knowvah/dot-atlassian and then
+      # broke Dependabot's npm updates outright. Publishing here too lets those
+      # consumers use ordinary version ranges, with no URL pins anywhere.
+      #
+      # npmjs stays the primary registry: it publishes first, with provenance,
+      # and this step runs after it, so a failure here cannot affect it. No
+      # provenance and no OIDC — GitHub Packages supports neither; GITHUB_TOKEN
+      # authenticates instead. Publishing the identical tarball npm received,
+      # not a repack, so the two registries cannot drift.
+      - if: ${{ steps.release.outputs.releases_created == 'true' }}
+        name: Mirror to GitHub Packages
+        env:
+          PATHS_RELEASED: ${{ steps.release.outputs.paths_released }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          registry=https://npm.pkg.github.com
+          npm config set //npm.pkg.github.com/:_authToken "$GH_PACKAGES_TOKEN"
+          echo "$PATHS_RELEASED" | jq -r '.[]' | while read -r pkgdir; do
+            name="$(node -p "require('./$pkgdir/package.json').name")"
+            version="$(node -p "require('./$pkgdir/package.json').version")"
+            if npm view --registry "$registry" "$name@$version" version >/dev/null 2>&1; then
+              echo "==> $name@$version already on GitHub Packages, skipping"
+              continue
+            fi
+            tgz="$(cd "$pkgdir" && pnpm pack --pack-destination "$RUNNER_TEMP" | tail -1)"
+            echo "==> mirroring $tgz"
+            npm publish "$tgz" --registry "$registry" --access public
           done
