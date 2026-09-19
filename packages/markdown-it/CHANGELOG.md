@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v2.0.0...dot-markdown-it-v3.0.0) (2026-09-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* Node 22 and Node 24 are no longer supported. Consumers must run Node 26 or later.
+
+### Features
+
+* require node 26 and refresh dev dependencies ([#29](https://github.com/knowvah/dot-plugins/issues/29)) ([1e322ab](https://github.com/knowvah/dot-plugins/commit/1e322ab8d24e6d93edafb3b81a37591a690c51a1))
+
 ## [2.0.0](https://github.com/knowvah/dot-plugins/compare/dot-markdown-it-v1.1.0...dot-markdown-it-v2.0.0) (2026-08-02)
 
 
