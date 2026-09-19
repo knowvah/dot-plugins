@@ -1,7 +1,7 @@
 {
   "name": "@knowvah/vitepress-plugin-dot",
   "version": "3.0.0",
-  "description": "Render Graphviz DOT fenced code blocks to inline SVG in VitePress — at build time, no client JS, powered by the pure-TypeScript @knowvah/dot-engine.",
+  "description": "Render Graphviz DOT fenced code blocks to inline SVG in VitePress \u2014 at build time, no client JS, powered by the pure-TypeScript @knowvah/dot-engine.",
   "type": "module",
   "license": "MIT",
   "keywords": [
@@ -54,7 +54,7 @@
   },
   "peerDependencies": {
     "@knowvah/dot-engine": ">=1.2.5",
-    "vitepress": "^1.0.0",
+    "vitepress": "^1.0.0 || ^2.0.0-alpha.1",
     "vue": "^3.4.0"
   },
   "peerDependenciesMeta": {
