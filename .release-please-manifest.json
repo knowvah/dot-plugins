@@ -1,7 +1,7 @@
 {
   "packages/core": "3.0.0",
   "packages/markdown-it": "3.0.0",
-  "packages/vitepress": "3.0.0",
+  "packages/vitepress": "3.0.1",
   "packages/eleventy": "3.0.0",
   "packages/docusaurus": "3.0.0",
   "packages/react": "3.0.0"

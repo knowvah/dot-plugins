@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v3.0.0...vitepress-plugin-dot-v3.0.1) (2026-09-19)
+
+
+### Bug Fixes
+
+* **vitepress:** accept vitepress 2 in the peer range ([5f26598](https://github.com/knowvah/dot-plugins/commit/5f26598450fd7e5bc5a52300f6b364537beed7b8))
+
 ## [3.0.0](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v2.0.0...vitepress-plugin-dot-v3.0.0) (2026-09-19)
 
 
