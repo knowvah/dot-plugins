@@ -159,7 +159,7 @@
     "@knowvah/dot-markdown-it": "workspace:*",
     "@types/node": "^26.6.2",
     "@types/vscode": "^1.125.0",
-    "@vscode/vsce": "^3.9.2",
+    "@vscode/vsce": "^4.0.0",
     "esbuild": "^0.28.2",
     "markdown-it": "^15.0.2",
     "ovsx": "^1.2.0",
