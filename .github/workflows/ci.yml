@@ -1,0 +1,71 @@
+name: CI
+
+# D9: this repo has no PR gate today. Build before typecheck: each package
+# typechecks against its siblings' emitted dist/ (workspace project
+# references), so a stale or missing dist/ produces spurious typecheck
+# errors. D3: root vitest config runs every package's tests in one process
+# (test.projects: ['packages/*']), so there is exactly one coverage report
+# and one Code Quality label for this repo.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm -r build
+
+      - run: pnpm -r typecheck
+
+      - name: Test with coverage
+        run: pnpm coverage
+
+      # D2: publish the report even if thresholds failed the step above.
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        with:
+          name: coverage
+          path: coverage/cobertura-coverage.xml
+          if-no-files-found: error
+          retention-days: 7
+
+  # Publishes line coverage to GitHub Code Quality (PR comment + main baseline).
+  # Own job so code-quality:write never reaches the job that runs pnpm
+  # install scripts. Fork PRs cannot get a write token and are skipped.
+  # on-call: if upload-coverage 403s, enable Code Quality in repo Settings ->
+  # Security -> Code quality, then re-run the failed job.
+  upload-coverage:
+    needs: [ci]
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage
+          path: coverage
+
+      - uses: actions/upload-code-coverage@d8e329117199404bba6fc81efe8093dc7c015e34 # v1.4.2
+        with:
+          file: coverage/cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/vitest
