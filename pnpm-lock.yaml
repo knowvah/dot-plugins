@@ -8,6 +8,7 @@ overrides:
   vite@5: ^6.4.3
   esbuild@0.27: ^0.28.1
   undici@7: 7.29.1
+  markdown-it@14: 14.3.2
 
 importers:
 
@@ -2995,8 +2996,8 @@ packages:
     resolution: {integrity: sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q==}
     engines: {node: '>=16'}
 
-  markdown-it@14.3.0:
-    resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
+  markdown-it@14.3.2:
+    resolution: {integrity: sha512-sHHjZ5fJKlgrG4qns2YwVcdNep35h5fERrfkD2YNsb9UFk0UIHarbiTaHKVMlPuWAoiilyK8Fv/jAm11slsY7Q==}
     hasBin: true
 
   markdown-it@15.0.2:
@@ -3041,9 +3042,6 @@ packages:
 
   mdn-data@2.27.1:
     resolution: {integrity: sha512-9Yubnt3e8A0OKwxYSXyhLymGW4sCufcLG6VdiDdUGVkPhpqLxlvP5vl1983gQjJl3tqbrM731mjaZaP68AgosQ==}
-
-  mdurl@2.0.0:
-    resolution: {integrity: sha512-Lf+9+2r+Tdp5wXDXC4PcIBjTDtq4UKjCPMQhKIuzpJNW0b96kVqSwW0bT7FhRSfmAiFYgP+SCRvdrDozfh0U5w==}
 
   mdurl@2.1.0:
     resolution: {integrity: sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg==}
@@ -4292,7 +4290,7 @@ snapshots:
       kleur: 4.1.5
       liquidjs: 10.27.2
       luxon: 3.7.2
-      markdown-it: 14.3.0
+      markdown-it: 14.3.2
       minimist: 1.2.8
       moo: 0.5.2
       node-retrieve-globals: 6.0.1
@@ -5689,7 +5687,7 @@ snapshots:
       hosted-git-info: 4.1.0
       jsonc-parser: 3.3.1
       leven: 3.1.0
-      markdown-it: 14.3.0
+      markdown-it: 14.3.2
       mime: 1.6.0
       minimatch: 10.2.6
       parse-semver: 1.1.1
@@ -6945,12 +6943,12 @@ snapshots:
 
   markdown-extensions@2.0.0: {}
 
-  markdown-it@14.3.0:
+  markdown-it@14.3.2:
     dependencies:
       argparse: 2.0.1
       entities: 4.5.0
       linkify-it: 5.0.2
-      mdurl: 2.0.0
+      mdurl: 2.1.0
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
@@ -7067,8 +7065,6 @@ snapshots:
       '@types/mdast': 4.0.4
 
   mdn-data@2.27.1: {}
-
-  mdurl@2.0.0: {}
 
   mdurl@2.1.0: {}
 
