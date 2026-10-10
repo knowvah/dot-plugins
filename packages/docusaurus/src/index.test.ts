@@ -45,6 +45,13 @@ describe('remarkDot — build mode (default)', () => {
     expect(node.children?.[0]?.value).toBeTruthy();
   });
 
+  it('renders an unknown engine as an error <div>, not a build crash', () => {
+    // dot-engine 2.x throws a TypeError for an unregistered engine.
+    const node = transform(codeNode('dot', 'digraph { a -> b }', 'engine=foo'));
+    expect(attrOf(node, 'className')!.value).toBe('dot-diagram-error');
+    expect(node.children?.[0]?.value).toContain('Received "foo"');
+  });
+
   it('compiles cleanly through the real MDX pipeline', async () => {
     const out = String(
       await compile('```dot\ndigraph { a -> b }\n```\n', {

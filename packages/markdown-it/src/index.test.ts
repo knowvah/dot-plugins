@@ -24,6 +24,13 @@ describe('dotMarkdown — build mode', () => {
   it('emits an error panel on invalid DOT', () => {
     expect(render('dot', 'nope {{{')).toContain('dot-diagram-error');
   });
+  it('renders an unknown engine as an error panel, not a build crash', () => {
+    // dot-engine 2.x throws a TypeError for an unregistered engine.
+    const out = render('dot engine=foo', 'digraph { a -> b }');
+    expect(out).toContain('dot-diagram-error');
+    expect(out).toContain('Received &quot;foo&quot;');
+    expect(out).not.toContain('<svg');
+  });
   it('honors a per-block engine', () => {
     expect(render('dot engine=neato', 'graph{a--b--c--a}')).toContain('<svg');
   });
