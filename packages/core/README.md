@@ -44,6 +44,12 @@ import { renderDiagram } from '@knowvah/dot-core/browser';
 const { svg, error } = await renderDiagram('digraph { a -> b }', 'dot', false);
 ```
 
+`renderDiagram` uses `@knowvah/dot-engine`'s `renderSvgAsync`: it loads the web
+fonts the graph names (from `document.fonts`, up to 3 s) before layout, so
+labels are measured with the real font. It never rejects; every failure,
+including an unknown engine name, resolves as `{ error }`. The SVG is not
+sanitized, so render trusted DOT only or apply a Content-Security-Policy.
+
 Or drop in the framework-neutral custom element:
 
 ```js
