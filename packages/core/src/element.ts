@@ -19,7 +19,19 @@
 import { renderDiagram } from './browser.js';
 
 export class DotDiagramElement extends HTMLElement {
+  /**
+   * Identifies the latest render. Rendering is async (fonts load first), so a
+   * slow render can finish after the element was disconnected or reconnected
+   * with another `graph`; only the render holding the current id may write.
+   */
+  #renderId = 0;
+
+  disconnectedCallback(): void {
+    this.#renderId++; // abandon any render still in flight
+  }
+
   async connectedCallback(): Promise<void> {
+    const renderId = ++this.#renderId;
     const graph = this.getAttribute('graph') ?? '';
     const engine = this.getAttribute('engine') ?? 'dot';
     const wrapperClass = this.getAttribute('wrapper-class') ?? 'dot-diagram';
@@ -30,6 +42,8 @@ export class DotDiagramElement extends HTMLElement {
       engine,
       useCurrentColor,
     );
+
+    if (renderId !== this.#renderId) return;
 
     if (state.error != null) {
       this.className = `${wrapperClass}-error`;
