@@ -14,23 +14,41 @@ export interface DiagramState {
   error?: string;
 }
 
-/** Render a DOT string to inline SVG (or an error message) in the browser. */
+type DotEngine = typeof import('@knowvah/dot-engine');
+
+/** The user-facing text for anything the engine (or its import) can throw. */
+function errorMessage(e: unknown, engine: DotEngine | undefined): string {
+  if (engine?.isGvError(e)) return e.friendlyMessage;
+  return e instanceof Error ? e.message : String(e);
+}
+
+/**
+ * Render a DOT string to inline SVG (or an error message) in the browser.
+ *
+ * Uses the engine's async API so the web fonts the graph names are loaded
+ * (from `document.fonts`) before layout measures any text; otherwise labels
+ * would be sized with a fallback font. Never rejects: dot-engine 2.x throws
+ * `DotEngineError`s for bad DOT and `TypeError`s for a bad call (for example an
+ * unregistered engine from a fence like `engine=foo`), all mapped to `{ error }`.
+ *
+ * The returned SVG is not sanitized (neither is `renderSvgAsync`): embed it
+ * only for trusted DOT, or apply a Content-Security-Policy.
+ */
 export async function renderDiagram(
   dot: string,
   engine: string,
   useCurrentColor: boolean,
 ): Promise<DiagramState> {
+  let loaded: DotEngine | undefined;
   try {
-    const { tryRenderSvg } = await import('@knowvah/dot-engine');
-    const result = tryRenderSvg(dot, normalizeEngine(engine) as EngineName);
-    if (result.svg != null) {
-      const inline = toInlineSvg(result.svg);
-      return { svg: useCurrentColor ? currentColorRemap(inline) : inline };
-    }
-    return {
-      error: result.errors?.[0]?.friendlyMessage ?? 'Failed to render graph.',
-    };
+    loaded = await import('@knowvah/dot-engine');
+    const { svg } = await loaded.renderSvgAsync(
+      dot,
+      normalizeEngine(engine) as EngineName,
+    );
+    const inline = toInlineSvg(svg);
+    return { svg: useCurrentColor ? currentColorRemap(inline) : inline };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : String(e) };
+    return { error: errorMessage(e, loaded) };
   }
 }
