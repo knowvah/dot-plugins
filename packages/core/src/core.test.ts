@@ -6,6 +6,7 @@ import {
   currentColorRemap,
   resolveConfig,
   renderDotHtml,
+  renderDotSvg,
   type ResolvedConfig,
 } from './index.js';
 import { renderDiagram } from './browser.js';
@@ -99,6 +100,91 @@ describe('renderDotHtml (build-mode render)', () => {
     const html = renderDotHtml('digraph { a -> b }', 'dot', cfg);
     expect(html).toContain('dot-diagram-error');
     expect(html.toLowerCase()).toMatch(/timeout|aborted/);
+  });
+});
+
+// dot-engine 2.x throws (TypeError ERR_INVALID_ARG_VALUE / _TYPE) for an
+// unregistered engine or a non-string source instead of returning { errors }.
+// A fence such as ```dot engine=foo reaches the engine after normalizeEngine,
+// which only lowercases, so a typo must become a readable panel, not a crash.
+const UNKNOWN_ENGINE_PANEL = 'The argument &quot;engine&quot; is invalid';
+const WORKER_FALLBACK_TEXT = 'could not be rendered in the worker process';
+const UNSUPPORTED_FEATURE_TEXT =
+  'The graph uses a Graphviz feature that dot-engine does not support yet.';
+const UNSUPPORTED_FEATURE_DOT = 'graph { mode=hier; a -- b }';
+
+describe('renderDotSvg / renderDotHtml (dot-engine 2.0 error contract)', () => {
+  it('returns the engine TypeError as a structured error (in-process)', () => {
+    const result = renderDotSvg('digraph { a }', 'foo' as never, CFG);
+    expect(result.svg).toBeUndefined();
+    expect(result.error?.type).toBe('render');
+    expect(result.error?.message).toContain('Received "foo"');
+    expect(result.error?.friendlyMessage).toContain('allowed: dot, neato');
+  });
+
+  it('renders an unknown engine as an error panel (in-process)', () => {
+    const html = renderDotHtml('digraph { a }', 'foo' as never, CFG);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain(UNKNOWN_ENGINE_PANEL);
+    expect(html).not.toContain('<svg');
+  });
+
+  it('shows the engine message once when it is also the friendly text', () => {
+    const html = renderDotHtml('digraph { a }', 'foo' as never, CFG);
+    expect(html).not.toContain('<code>');
+  });
+
+  it('renders an unknown engine as an error panel (child process)', () => {
+    const cfg = resolveConfig({ timeout: 15000 });
+    const html = renderDotHtml('digraph { a }', 'foo' as never, cfg);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain(UNKNOWN_ENGINE_PANEL);
+    expect(html).not.toContain(WORKER_FALLBACK_TEXT);
+  });
+
+  it('renders a non-string source as an error panel (in-process)', () => {
+    const html = renderDotHtml(42 as never, 'dot', CFG);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain('must be of type string');
+  });
+
+  it('renders a non-string engine as an error panel (in-process)', () => {
+    const html = renderDotHtml('digraph { a }', 7 as never, CFG);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain('Graphviz render error');
+  });
+
+  it('renders UNSUPPORTED_FEATURE as an error panel (in-process)', () => {
+    const html = renderDotHtml(UNSUPPORTED_FEATURE_DOT, 'neato', CFG);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain(UNSUPPORTED_FEATURE_TEXT);
+    expect(html).toContain('mode=hier');
+  });
+
+  it('renders UNSUPPORTED_FEATURE as an error panel (child process)', () => {
+    const cfg = resolveConfig({ timeout: 15000 });
+    const html = renderDotHtml(UNSUPPORTED_FEATURE_DOT, 'neato', cfg);
+    expect(html).toContain(UNSUPPORTED_FEATURE_TEXT);
+    expect(html).toContain('mode=hier');
+    expect(html).not.toContain(WORKER_FALLBACK_TEXT);
+  });
+
+  it('keeps the syntax-error location through the child process', () => {
+    const cfg = resolveConfig({ timeout: 15000 });
+    const html = renderDotHtml('digraph {\n  a ->\n', 'dot', cfg);
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toMatch(/line \d+, column \d+/);
+  });
+
+  it('throws the real engine message when onError is "throw"', () => {
+    const inProcess = resolveConfig({ onError: 'throw' });
+    expect(() => renderDotHtml('digraph { a }', 'foo' as never, inProcess)).toThrow(
+      /\[dot-core\].*Received "foo"/,
+    );
+    const child = resolveConfig({ onError: 'throw', timeout: 15000 });
+    expect(() => renderDotHtml('digraph { a }', 'foo' as never, child)).toThrow(
+      /\[dot-core\].*Received "foo"/,
+    );
   });
 });
 
