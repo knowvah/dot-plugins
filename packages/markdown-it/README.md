@@ -15,6 +15,8 @@ of the adapter packages.
 npm i @knowvah/dot-markdown-it @knowvah/dot-engine
 ```
 
+`@knowvah/dot-engine` is a peer dependency; version `>=2.0.0` is required.
+
 ## Usage
 
 ```ts

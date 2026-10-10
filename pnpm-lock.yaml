@@ -24,8 +24,8 @@ importers:
   packages/core:
     devDependencies:
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -55,8 +55,8 @@ importers:
         version: 5.1.0
     devDependencies:
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@mdx-js/mdx':
         specifier: ^3.1.1
         version: 3.1.1
@@ -95,8 +95,8 @@ importers:
         specifier: ^3.1.6
         version: 3.1.6
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -120,8 +120,8 @@ importers:
         version: link:../core
     devDependencies:
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -145,8 +145,8 @@ importers:
         version: link:../core
     devDependencies:
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -182,8 +182,8 @@ importers:
         version: link:../markdown-it
     devDependencies:
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -212,8 +212,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@knowvah/dot-engine':
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^2.3.0
+        version: 2.3.0
       '@knowvah/dot-markdown-it':
         specifier: workspace:*
         version: link:../markdown-it
@@ -1008,8 +1008,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@knowvah/dot-engine@1.6.0':
-    resolution: {integrity: sha512-AJChU9Hvdp3RbIOyKbw9IDdz4ZEyKLwAxE5u7p1Ti5Fzl2vgSl4DWw0ZKjtagq5FK2lj2HBtTUoJjGyIEMFuLQ==}
+  '@knowvah/dot-engine@2.3.0':
+    resolution: {integrity: sha512-fwTy6TCGIEtN+vZUxFs601ZTV47fzotg1H0rCDB1R6KLnw8+hX4ANHTSYR/aEnTTMyr/QpLcW8nHAyg5Hz4Liw==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       canvas: '>=2 <4'
@@ -4962,7 +4962,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@knowvah/dot-engine@1.6.0': {}
+  '@knowvah/dot-engine@2.3.0': {}
 
   '@mdx-js/mdx@3.1.1':
     dependencies:

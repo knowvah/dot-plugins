@@ -15,7 +15,7 @@ npm i -D @knowvah/eleventy-plugin-dot @knowvah/dot-engine
 ```
 
 Requires **Eleventy 2.0+** (uses `amendLibrary`) with its default markdown-it
-engine. `@knowvah/dot-engine` is a peer dependency.
+engine. `@knowvah/dot-engine` (`>=2.0.0`) is a peer dependency.
 
 ## Usage
 

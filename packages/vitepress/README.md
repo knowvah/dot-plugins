@@ -28,7 +28,8 @@ digraph {
 npm i -D @knowvah/vitepress-plugin-dot @knowvah/dot-engine
 ```
 
-`@knowvah/dot-engine` is a peer dependency — you install the engine version you want.
+`@knowvah/dot-engine` is a peer dependency — you install the engine version
+you want, as long as it is `>=2.0.0`.
 
 ## Usage
 

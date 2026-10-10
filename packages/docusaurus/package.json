@@ -47,7 +47,7 @@
     "unist-util-visit": "^5.1.0"
   },
   "peerDependencies": {
-    "@knowvah/dot-engine": ">=1.2.5",
+    "@knowvah/dot-engine": ">=2.0.0",
     "react": ">=18"
   },
   "peerDependenciesMeta": {
@@ -56,7 +56,7 @@
     }
   },
   "devDependencies": {
-    "@knowvah/dot-engine": "^1.6.0",
+    "@knowvah/dot-engine": "^2.3.0",
     "@mdx-js/mdx": "^3.1.1",
     "@types/mdast": "^4.0.4",
     "@types/node": "^26.6.2",

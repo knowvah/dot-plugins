@@ -13,7 +13,7 @@ public so you can build your own adapter for any generator.
 npm i @knowvah/dot-core @knowvah/dot-engine
 ```
 
-`@knowvah/dot-engine` is a peer dependency.
+`@knowvah/dot-engine` is a peer dependency; version `>=2.0.0` is required.
 
 ## Entry points
 
