@@ -39,6 +39,15 @@ describe('extendMarkdownIt — VS Code Markdown preview', () => {
     expect(html).not.toContain('<svg');
   });
 
+  it('renders an unknown engine in the fence as an error panel', () => {
+    // dot-engine 2.x throws for an unregistered engine; a typo in the fence
+    // info must not break the whole Markdown preview.
+    const html = render('```dot engine=foo\ndigraph { a -> b }\n```\n');
+    expect(html).toContain('dot-diagram-error');
+    expect(html).toContain('Received &quot;foo&quot;');
+    expect(html).not.toContain('<svg');
+  });
+
   it('honors a per-block engine override', () => {
     // neato lays out `graph { a -- b }`; just assert it renders to SVG.
     const html = render('```dot engine=neato\ngraph { a -- b }\n```\n');

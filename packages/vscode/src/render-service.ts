@@ -8,14 +8,9 @@
  */
 import { Worker } from 'node:worker_threads';
 import type { PreviewResult } from './preview.js';
+import type { RenderRequest } from './render-request.js';
 
-export interface RenderRequest {
-  dot: string;
-  engine: string;
-  /** Remap the diagram's black strokes/text to CSS `currentColor` so it
-   * follows the editor theme. Omitted/undefined renders native (black). */
-  useCurrentColor?: boolean;
-}
+export type { RenderRequest };
 
 // Shape the worker posts back (a dot-core DotSvgResult; error is GvError-like).
 interface WorkerResult {
