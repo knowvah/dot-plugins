@@ -12,7 +12,7 @@ Docusaurus, etc.
 npm i @knowvah/dot-react @knowvah/dot-engine
 ```
 
-`react` and `@knowvah/dot-engine` are peer dependencies.
+`react` and `@knowvah/dot-engine` (`>=2.0.0`) are peer dependencies.
 
 ## Usage
 

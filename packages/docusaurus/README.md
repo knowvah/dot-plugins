@@ -17,7 +17,8 @@ React component that renders in the browser instead.
 npm i -D @knowvah/docusaurus-plugin-dot @knowvah/dot-engine
 ```
 
-`react` and `@knowvah/dot-engine` are peer dependencies (Docusaurus provides React).
+`react` and `@knowvah/dot-engine` (`>=2.0.0`) are peer dependencies (Docusaurus
+provides React).
 
 ## Usage
 
