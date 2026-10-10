@@ -37,6 +37,11 @@ const html = renderDotHtml('digraph { a -> b }', 'dot', cfg);
 when `resolveConfig({ timeout })` is set, renders in a child process so a
 pathological graph aborts to an error panel instead of hanging the build.
 
+A bad diagram never fails the build (unless `onError: 'throw'`): invalid DOT, an
+unknown engine name (`engine=foo`), an unsupported Graphviz feature and a
+non-string source all render as the error panel, with the engine's readable
+message, in-process and in the `timeout` child process alike.
+
 ## Client-side render (browser)
 
 ```ts
