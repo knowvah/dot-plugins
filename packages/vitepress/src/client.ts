@@ -16,7 +16,7 @@
  * };
  * ```
  */
-import { defineComponent, h, onMounted, ref } from 'vue';
+import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { renderDiagram, type DiagramState } from '@knowvah/dot-core/browser';
 
 export { renderDiagram } from '@knowvah/dot-core/browser';
@@ -24,7 +24,9 @@ export type { DiagramState } from '@knowvah/dot-core/browser';
 
 /**
  * `<DotDiagram>` — renders its `graph` prop (a URI-encoded DOT string) to SVG on
- * mount. Emitted by the markdown-it plugin in client mode.
+ * mount, and again whenever a prop changes. Emitted by the markdown-it plugin
+ * in client mode. Rendering is async (web fonts load first), so a slow render
+ * that finishes after a newer one started, or after unmount, is discarded.
  */
 export const DotDiagram = defineComponent({
   name: 'DotDiagram',
@@ -36,12 +38,24 @@ export const DotDiagram = defineComponent({
   },
   setup(props) {
     const state = ref<DiagramState>({});
-    onMounted(async () => {
-      state.value = await renderDiagram(
+    // Id of the latest render; a render may only write while it still holds it.
+    let renderId = 0;
+    const render = async (): Promise<void> => {
+      const id = ++renderId;
+      const next = await renderDiagram(
         decodeURIComponent(props.graph),
         props.engine,
         props.useCurrentColor,
       );
+      if (id === renderId) state.value = next;
+    };
+    onMounted(render);
+    watch(
+      [() => props.graph, () => props.engine, () => props.useCurrentColor],
+      render,
+    );
+    onBeforeUnmount(() => {
+      renderId++; // abandon any render still in flight
     });
     return () => {
       const { error, svg } = state.value;
