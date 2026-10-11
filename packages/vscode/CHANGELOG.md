@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- **Bundles `@knowvah/dot-engine` 2.3** (was 1.2). Layouts follow the newer
+  engine, so some diagrams may position nodes and edges slightly differently.
+- **Unknown layout engines name the problem.** An `// engine: foo` directive
+  or a ` ```dot engine=foo ` fence now reports that the engine is invalid,
+  instead of the generic "The graph could not be laid out or rendered."
+
 ## 1.1.0
 
 - **Raised the minimum supported VS Code version to 1.125.0** (was 1.85.0).
