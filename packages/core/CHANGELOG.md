@@ -1,5 +1,24 @@
 # Changelog
 
+## [4.0.0](https://github.com/knowvah/dot-plugins/compare/dot-core-v3.0.0...dot-core-v4.0.0) (2026-10-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **core:** requires @knowvah/dot-engine >=2.0.0 (peer range raised from >=1.2.5)
+* requires @knowvah/dot-engine >=2.0.0 (peer range raised from >=1.2.5). Consumers must upgrade the engine.
+
+### Features
+
+* **core:** render client-side diagrams with renderSvgAsync ([4af8f43](https://github.com/knowvah/dot-plugins/commit/4af8f43d59c6184c426b2a994c4d009e6ecee2c5))
+* require @knowvah/dot-engine &gt;=2.0.0 ([8aa0a3d](https://github.com/knowvah/dot-plugins/commit/8aa0a3dab7243a5ba70d354345d2248e9803c8c2))
+
+
+### Bug Fixes
+
+* **core:** ignore stale &lt;dot-diagram&gt; renders ([d59034e](https://github.com/knowvah/dot-plugins/commit/d59034ed26ea1da4e4b759dbe1b590965209900c))
+* **core:** render dot-engine 2.0 usage errors as an error panel ([a190b31](https://github.com/knowvah/dot-plugins/commit/a190b31b7606ea51ac7c1e044d53207efb1fa7ba))
+
 ## [3.0.0](https://github.com/knowvah/dot-plugins/compare/dot-core-v2.0.0...dot-core-v3.0.0) (2026-09-19)
 
 
