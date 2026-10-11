@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.0.0](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v3.0.1...vitepress-plugin-dot-v4.0.0) (2026-10-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires @knowvah/dot-engine >=2.0.0 (peer range raised from >=1.2.5). Consumers must upgrade the engine.
+
+### Features
+
+* require @knowvah/dot-engine &gt;=2.0.0 ([8aa0a3d](https://github.com/knowvah/dot-plugins/commit/8aa0a3dab7243a5ba70d354345d2248e9803c8c2))
+
+
+### Bug Fixes
+
+* **vitepress:** re-render client diagram on prop change ([1c51b38](https://github.com/knowvah/dot-plugins/commit/1c51b387bbc949c584fe8f3648110234771d427f))
+
 ## [3.0.1](https://github.com/knowvah/dot-plugins/compare/vitepress-plugin-dot-v3.0.0...vitepress-plugin-dot-v3.0.1) (2026-09-19)
 
 

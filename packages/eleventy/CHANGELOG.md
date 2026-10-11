@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/knowvah/dot-plugins/compare/eleventy-plugin-dot-v3.0.0...eleventy-plugin-dot-v4.0.0) (2026-10-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires @knowvah/dot-engine >=2.0.0 (peer range raised from >=1.2.5). Consumers must upgrade the engine.
+
+### Features
+
+* require @knowvah/dot-engine &gt;=2.0.0 ([8aa0a3d](https://github.com/knowvah/dot-plugins/commit/8aa0a3dab7243a5ba70d354345d2248e9803c8c2))
+
 ## [3.0.0](https://github.com/knowvah/dot-plugins/compare/eleventy-plugin-dot-v2.0.0...eleventy-plugin-dot-v3.0.0) (2026-09-19)
 
 
