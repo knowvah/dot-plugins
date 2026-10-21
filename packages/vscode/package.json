@@ -161,7 +161,7 @@
     "@types/vscode": "^1.125.0",
     "@vscode/vsce": "^4.0.0",
     "esbuild": "^0.28.2",
-    "markdown-it": "^15.0.2",
+    "markdown-it": "^15.0.3",
     "ovsx": "^1.2.0",
     "typescript": "^6.0.3",
     "vitest": "^5.0.1"
